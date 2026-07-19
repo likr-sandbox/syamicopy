@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+/dist
+/dev-dist
+
+# Testing directories
+/playwright-report
+/test-results
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Local development files
+.DS_Store
+.agents/
+
+# IDE / Editor configuration
+.vscode/
+.idea/
+.gemini/
