@@ -1,0 +1,23 @@
+[
+  { "pitch": 67, "step": 0, "length": 2 },
+  { "pitch": 67, "step": 2, "length": 2 },
+  { "pitch": 64, "step": 4, "length": 4 },
+  { "pitch": 67, "step": 8, "length": 2 },
+  { "pitch": 67, "step": 10, "length": 2 },
+  { "pitch": 64, "step": 12, "length": 4 },
+  { "pitch": 67, "step": 16, "length": 2 },
+  { "pitch": 67, "step": 18, "length": 2 },
+  { "pitch": 67, "step": 20, "length": 2 },
+  { "pitch": 64, "step": 22, "length": 2 },
+  { "pitch": 65, "step": 24, "length": 2 },
+  { "pitch": 64, "step": 26, "length": 2 },
+  { "pitch": 62, "step": 28, "length": 4 },
+  { "pitch": 67, "step": 32, "length": 2 },
+  { "pitch": 67, "step": 34, "length": 2 },
+  { "pitch": 65, "step": 36, "length": 2 },
+  { "pitch": 64, "step": 38, "length": 2 },
+  { "pitch": 62, "step": 40, "length": 2 },
+  { "pitch": 62, "step": 42, "length": 2 },
+  { "pitch": 64, "step": 44, "length": 2 },
+  { "pitch": 60, "step": 46, "length": 2 }
+]
