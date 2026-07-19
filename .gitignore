@@ -14,7 +14,8 @@ node_modules/
 
 # Local development files
 .DS_Store
-.agents/
+.agents/*
+!.agents/skills/
 
 # IDE / Editor configuration
 .vscode/
