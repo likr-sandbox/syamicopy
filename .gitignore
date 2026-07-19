@@ -18,6 +18,7 @@ node_modules/
 !.agents/skills/
 !.agents/docs/
 !.agents/rules/
+!.agents/AGENTS.md
 
 # IDE / Editor configuration
 .vscode/

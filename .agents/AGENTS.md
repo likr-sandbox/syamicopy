@@ -17,4 +17,4 @@ For detailed technical documentation, agents must refer to the following files l
 
 ## Key Working Rules (Hygiene)
 1. **Clean Workspace:** Never leave temporary scratch files, test output, or `handoff.md` files in the source directories. Put them in `.agents/` or delete them after use.
-2. **Context Updates:** When architectural shifts occur, or new significant rules emerge, update this `AGENTS.md` file to reflect them.
+2. **Context Updates:** When architectural shifts occur, or new significant rules emerge, update this `.agents/AGENTS.md` file to reflect them.
