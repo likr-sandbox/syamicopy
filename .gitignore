@@ -16,6 +16,7 @@ node_modules/
 .DS_Store
 .agents/*
 !.agents/skills/
+!.agents/docs/
 
 # IDE / Editor configuration
 .vscode/
