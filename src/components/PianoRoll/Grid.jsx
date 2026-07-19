@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   MAX_PITCH,
   MIN_PITCH,
@@ -32,6 +32,13 @@ export const Grid = ({
 
   const openPitches = getStringOpenPitches(tuning, basePitch);
 
+  const lastDeleteTimeRef = useRef(0);
+
+  const handleDeleteNote = (id) => {
+    lastDeleteTimeRef.current = Date.now();
+    deleteNote(id);
+  };
+
   const pitches = [];
   for (let p = MAX_PITCH; p >= MIN_PITCH; p--) {
     pitches.push(p);
@@ -40,6 +47,10 @@ export const Grid = ({
   const handleGridClick = (e) => {
     // Avoid triggering when note blocks or resize handles are clicked
     if (e.target.closest('[data-testid^="note-block-"]')) {
+      return;
+    }
+
+    if (Date.now() - lastDeleteTimeRef.current < 300) {
       return;
     }
 
@@ -158,6 +169,9 @@ export const Grid = ({
                   data-testid={`grid-cell-${step}-${pitch}`}
                   onClick={(e) => {
                     e.stopPropagation();
+                    if (Date.now() - lastDeleteTimeRef.current < 300) {
+                      return;
+                    }
                     addNote({ pitch, step, length: 4 });
                     playKeySound(pitch);
                   }}
@@ -204,7 +218,7 @@ export const Grid = ({
             <NoteBlock
               key={note.id}
               note={note}
-              deleteNote={deleteNote}
+              deleteNote={handleDeleteNote}
               updateNote={updateNote}
               totalSteps={totalSteps}
               tuning={tuning}
