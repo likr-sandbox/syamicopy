@@ -3,6 +3,7 @@ import { PRESETS } from '../data/presets';
 import { JA } from '../i18n/ja';
 import { importAllData } from '../utils/storage';
 import Modal from './common/Modal';
+import aiPromptText from '../data/aiPrompt.txt?raw';
 
 export function NewProjectModal({
   isOpen,
@@ -118,9 +119,7 @@ export function NewProjectModal({
     e.target.value = '';
   };
 
-  const aiPromptText = `以下の楽譜を読み取り、指定のJSONフォーマットで出力してください。
-フォーマット: [ { "pitch": 48, "step": 0, "length": 4 }, ... ]
-※pitchはMIDIノート番号(中央ハ=60)、stepは0から始まる16分音符単位の開始位置、lengthは16分音符単位の音価（4分音符なら4）として計算してください。`;
+
 
   const copyPromptToClipboard = () => {
     navigator.clipboard

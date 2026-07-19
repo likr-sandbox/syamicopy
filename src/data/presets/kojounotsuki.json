@@ -1,26 +1,242 @@
 [
-  { "pitch": 59, "step": 0, "length": 4 },
-  { "pitch": 64, "step": 4, "length": 4 },
-  { "pitch": 66, "step": 8, "length": 4 },
-  { "pitch": 67, "step": 12, "length": 4 },
-  { "pitch": 60, "step": 16, "length": 4 },
-  { "pitch": 55, "step": 20, "length": 4 },
-  { "pitch": 54, "step": 24, "length": 8 },
-  { "pitch": 54, "step": 32, "length": 4 },
-  { "pitch": 55, "step": 36, "length": 4 },
-  { "pitch": 52, "step": 40, "length": 4 },
-  { "pitch": 48, "step": 44, "length": 4 },
-  { "pitch": 52, "step": 48, "length": 8 },
-  { "pitch": 59, "step": 64, "length": 4 },
-  { "pitch": 64, "step": 68, "length": 4 },
-  { "pitch": 66, "step": 72, "length": 4 },
-  { "pitch": 67, "step": 76, "length": 4 },
-  { "pitch": 60, "step": 80, "length": 4 },
-  { "pitch": 55, "step": 84, "length": 4 },
-  { "pitch": 54, "step": 88, "length": 8 },
-  { "pitch": 54, "step": 96, "length": 4 },
-  { "pitch": 55, "step": 100, "length": 4 },
-  { "pitch": 52, "step": 104, "length": 4 },
-  { "pitch": 48, "step": 108, "length": 4 },
-  { "pitch": 52, "step": 112, "length": 8 }
+  {
+    "pitch": 64,
+    "step": 0,
+    "length": 4
+  },
+  {
+    "pitch": 64,
+    "step": 4,
+    "length": 4
+  },
+  {
+    "pitch": 69,
+    "step": 8,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 12,
+    "length": 4
+  },
+  {
+    "pitch": 72,
+    "step": 16,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 20,
+    "length": 4
+  },
+  {
+    "pitch": 69,
+    "step": 24,
+    "length": 8
+  },
+  {
+    "pitch": 65,
+    "step": 32,
+    "length": 4
+  },
+  {
+    "pitch": 65,
+    "step": 36,
+    "length": 4
+  },
+  {
+    "pitch": 64,
+    "step": 40,
+    "length": 4
+  },
+  {
+    "pitch": 72,
+    "step": 44,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 48,
+    "length": 12
+  },
+  {
+    "pitch": 64,
+    "step": 64,
+    "length": 4
+  },
+  {
+    "pitch": 64,
+    "step": 68,
+    "length": 4
+  },
+  {
+    "pitch": 69,
+    "step": 72,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 76,
+    "length": 4
+  },
+  {
+    "pitch": 72,
+    "step": 80,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 84,
+    "length": 4
+  },
+  {
+    "pitch": 69,
+    "step": 88,
+    "length": 8
+  },
+  {
+    "pitch": 65,
+    "step": 96,
+    "length": 6
+  },
+  {
+    "pitch": 64,
+    "step": 102,
+    "length": 2
+  },
+  {
+    "pitch": 72,
+    "step": 104,
+    "length": 6
+  },
+  {
+    "pitch": 71,
+    "step": 110,
+    "length": 2
+  },
+  {
+    "pitch": 69,
+    "step": 112,
+    "length": 12
+  },
+  {
+    "pitch": 64,
+    "step": 128,
+    "length": 6
+  },
+  {
+    "pitch": 74,
+    "step": 134,
+    "length": 2
+  },
+  {
+    "pitch": 72,
+    "step": 136,
+    "length": 6
+  },
+  {
+    "pitch": 71,
+    "step": 142,
+    "length": 2
+  },
+  {
+    "pitch": 69,
+    "step": 144,
+    "length": 4
+  },
+  {
+    "pitch": 65,
+    "step": 148,
+    "length": 4
+  },
+  {
+    "pitch": 64,
+    "step": 152,
+    "length": 8
+  },
+  {
+    "pitch": 65,
+    "step": 160,
+    "length": 4
+  },
+  {
+    "pitch": 65,
+    "step": 164,
+    "length": 4
+  },
+  {
+    "pitch": 64,
+    "step": 168,
+    "length": 4
+  },
+  {
+    "pitch": 72,
+    "step": 172,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 176,
+    "length": 12
+  },
+  {
+    "pitch": 64,
+    "step": 192,
+    "length": 4
+  },
+  {
+    "pitch": 64,
+    "step": 196,
+    "length": 4
+  },
+  {
+    "pitch": 69,
+    "step": 200,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 204,
+    "length": 4
+  },
+  {
+    "pitch": 72,
+    "step": 208,
+    "length": 4
+  },
+  {
+    "pitch": 71,
+    "step": 212,
+    "length": 4
+  },
+  {
+    "pitch": 69,
+    "step": 216,
+    "length": 8
+  },
+  {
+    "pitch": 65,
+    "step": 224,
+    "length": 6
+  },
+  {
+    "pitch": 64,
+    "step": 230,
+    "length": 2
+  },
+  {
+    "pitch": 72,
+    "step": 232,
+    "length": 6
+  },
+  {
+    "pitch": 71,
+    "step": 238,
+    "length": 2
+  },
+  {
+    "pitch": 69,
+    "step": 240,
+    "length": 12
+  }
 ]

@@ -29,10 +29,10 @@ describe('Grid component', () => {
     // 8 measures * 16 steps/measure = 128 steps. Width = 128 * 24 = 3072px.
     expect(grid.style.width).toBe('3072px');
 
-    // 37 rows correspond to pitches 93 down to 57
+    // 49 rows correspond to pitches 84 down to 36
     const rows = grid.querySelectorAll('.border-b');
-    // Note: includes the header bar border if styled with border-b, plus 37 rows
-    expect(rows.length).toBeGreaterThanOrEqual(37);
+    // Note: includes the header bar border if styled with border-b, plus 49 rows
+    expect(rows.length).toBeGreaterThanOrEqual(49);
   });
 
   it('draws vertical grid lines at correct coordinates', () => {
@@ -52,16 +52,16 @@ describe('Grid component', () => {
       left: 0,
       top: 0,
       width: 3072,
-      height: 740,
+      height: 980,
       right: 3072,
-      bottom: 740,
+      bottom: 980,
       x: 0,
       y: 0,
       toJSON: () => {}
     }));
 
-    // Click at step 4 (4 * 24 = 96px), row 33 (33 * 20 = 660px, corresponding to pitch 93 - 33 = 60)
-    fireEvent.click(content, { clientX: 96, clientY: 660 });
+    // Click at step 4 (4 * 24 = 96px), row 24 (24 * 20 = 480px, corresponding to pitch 84 - 24 = 60)
+    fireEvent.click(content, { clientX: 96, clientY: 480 });
 
     expect(defaultProps.addNote).toHaveBeenCalledWith({
       pitch: 60,

@@ -1,0 +1,21 @@
+You are an accurate data entry operator. Please read the following sheet music image strictly according to its visual information and convert it into the specified JSON format.
+
+# Data Specifications
+- Format: [ { "pitch": 48, "step": 0, "length": 4 }, ... ]
+- pitch: MIDI note number (Middle C = 60).
+- step: The starting position in units of 16th notes, starting from 0 (e.g., in 4/4 time, one measure is 16 steps).
+- length: The note value in units of 16th notes (e.g., quarter note = 4, eighth note = 2, half note = 8).
+
+# Strict Rules (To prevent fatal errors)
+1. Absolute reliance on visual information: Completely discard any prior knowledge of common melodies. It is strictly forbidden to supplement or guess notes that do not explicitly exist in the image (e.g., adding inferred notes in the 4th or 8th measures).
+2. Strict handling of rests and note values: Do not create JSON objects for rests. Instead, advance the `step` of the next note by the duration of the rest. Do not fill in beats by guessing; interpret the written note values and rests mathematically exactly as they appear.
+
+# Processing Steps (You must output in this exact order)
+First, to prevent skipping any elements, execute [Step 1] below, and then output the JSON in [Step 2].
+
+[Step 1] Reading results per measure (Text)
+For each measure, sequentially list the pitches, note values, and rests read from the image.
+(Example - Measure 1: A4 (quarter), A4 (quarter), B4 (half))
+
+[Step 2] JSON Output
+Based on the results of Step 1, calculate the steps, and output ONLY the final JSON array within a code block.

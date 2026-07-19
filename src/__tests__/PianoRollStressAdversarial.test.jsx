@@ -291,7 +291,7 @@ describe('PianoRoll Components - Adversarial and Stress Tests', () => {
     it('safely handles glissando sweeps with 50 keys pressed and released rapidly without pointer leaks', () => {
       render(<Keyboard {...defaultProps} />);
 
-      // Press 37 keys in sequence (all keys available) and verify no crashes
+      // Press 49 keys in sequence (all keys available) and verify no crashes
       const keys = screen.getAllByTestId(/^key-/);
 
       // Down on all keys
@@ -300,7 +300,7 @@ describe('PianoRoll Components - Adversarial and Stress Tests', () => {
       }
 
       // Assert that startSustainedNote was triggered for each key
-      expect(audioUtils.startSustainedNote).toHaveBeenCalledTimes(37);
+      expect(audioUtils.startSustainedNote).toHaveBeenCalledTimes(49);
 
       // Release or pointerLeave all keys
       for (const key of keys) {
@@ -308,7 +308,7 @@ describe('PianoRoll Components - Adversarial and Stress Tests', () => {
       }
 
       // Assert that stopSustainedNote was triggered to clean up all keys
-      expect(audioUtils.stopSustainedNote).toHaveBeenCalledTimes(37);
+      expect(audioUtils.stopSustainedNote).toHaveBeenCalledTimes(49);
     });
 
     it('falls back to playKeySound when audioContext is null', () => {

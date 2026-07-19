@@ -49,28 +49,28 @@ describe('Keyboard component', () => {
     vi.clearAllMocks();
   });
 
-  it('renders exactly 37 keys', () => {
+  it('renders exactly 49 keys', () => {
     render(<Keyboard {...defaultProps} />);
     const keys = screen.getAllByTestId(/^key-/);
-    expect(keys).toHaveLength(37);
+    expect(keys).toHaveLength(49);
   });
 
-  it('renders pitch 93 at the top and 57 at the bottom', () => {
+  it('renders pitch 84 at the top and 36 at the bottom', () => {
     render(<Keyboard {...defaultProps} />);
     const keys = screen.getAllByTestId(/^key-/);
-    expect(keys[0]).toHaveAttribute('data-testid', 'key-93');
-    expect(keys[36]).toHaveAttribute('data-testid', 'key-57');
+    expect(keys[0]).toHaveAttribute('data-testid', 'key-84');
+    expect(keys[48]).toHaveAttribute('data-testid', 'key-36');
   });
 
   it('applies bg-nouaiBlue for black keys and bg-white for white keys', () => {
     render(<Keyboard {...defaultProps} />);
-    // MIDI 93 is A6 (white key)
-    const key93 = screen.getByTestId('key-93');
-    expect(key93.className).toContain('bg-white');
+    // MIDI 84 is C6 (white key)
+    const key84 = screen.getByTestId('key-84');
+    expect(key84.className).toContain('bg-white');
 
-    // MIDI 92 is G#6 (black key)
-    const key92 = screen.getByTestId('key-92');
-    expect(key92.className).toContain('bg-nouaiBlue');
+    // MIDI 82 is A#5 (black key)
+    const key82 = screen.getByTestId('key-82');
+    expect(key82.className).toContain('bg-nouaiBlue');
   });
 
   it('highlights open strings correctly (honchoshi open: 60, 65, 72)', () => {

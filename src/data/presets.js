@@ -28,8 +28,8 @@ export const PRESETS = {
     tuning: 'honchoshi',
     basePitch: 48,
     timeSignature: { numerator: 4, denominator: 4 },
-    bpm: 80,
-    measureCount: 12,
+    bpm: 72,
+    measureCount: 14,
     notes: sakuraNotes.map((note, index) => ({ id: `sakura-${index + 1}`, ...note }))
   },
   tulip: {
@@ -62,7 +62,7 @@ export const PRESETS = {
     basePitch: 48,
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 72,
-    measureCount: 8,
+    measureCount: 16,
     notes: kojounotsukiNotes.map((note, index) => ({ id: `kojo-${index + 1}`, ...note }))
   },
   furusato: {

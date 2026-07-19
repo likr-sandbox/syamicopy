@@ -44,10 +44,10 @@ describe('NoteBlock component', () => {
 
     // Position checks
     // left: 8 * 24 = 192px
-    // top: (93 - 60) * 20 = 33 * 20 = 660px
+    // top: (84 - 60) * 20 = 24 * 20 = 480px
     // width: 4 * 24 = 96px
     expect(block.style.left).toBe('192px');
-    expect(block.style.top).toBe('660px');
+    expect(block.style.top).toBe('480px');
     expect(block.style.width).toBe('96px');
 
     // Label: pitch label + shamisen label

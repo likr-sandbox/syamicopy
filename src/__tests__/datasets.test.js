@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { AI_PROMPT_TEMPLATE } from '../data/aiPrompt';
 import { PRESETS } from '../data/presets';
 import DefaultJA, { ja as NamedJa, JA as NamedJA } from '../i18n/ja';
 import { convertToShamisenNote } from '../utils/shamisen';
@@ -106,15 +105,7 @@ describe('Datasets and Localization verification', () => {
     });
   });
 
-  describe('aiPrompt.js verification', () => {
-    it('exports AI_PROMPT_TEMPLATE as a non-empty string', () => {
-      expect(AI_PROMPT_TEMPLATE).toBeDefined();
-      expect(typeof AI_PROMPT_TEMPLATE).toBe('string');
-      expect(AI_PROMPT_TEMPLATE.length).toBeGreaterThan(0);
-      expect(AI_PROMPT_TEMPLATE).toContain('JSON Schema');
-      expect(AI_PROMPT_TEMPLATE).toContain('Bunkafu');
-    });
-  });
+
 
   describe('ja.js verification', () => {
     it('exports default, named ja and Named JA, all containing correct localization data', () => {
