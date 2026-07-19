@@ -58,7 +58,9 @@ function App() {
       const canvas = await html2canvas(exportRef.current, {
         backgroundColor: '#FDFBF7',
         useCORS: true,
-        scale: 2
+        scale: 2,
+        scrollX: 0,
+        scrollY: 0
       });
       const isDefaultName =
         !currentProject?.name || currentProject.name === '無題のプロジェクト';
@@ -257,7 +259,16 @@ function App() {
       />
 
       {/* Hidden area for image export */}
-      <div className="absolute top-0 left-0 -translate-x-[9999px] pointer-events-none">
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          opacity: 0,
+          pointerEvents: 'none',
+          zIndex: -9999
+        }}
+      >
         <BunkafuExport
           ref={exportRef}
           notes={currentProject?.notes || []}

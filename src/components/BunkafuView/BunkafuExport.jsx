@@ -143,7 +143,7 @@ const BunkafuExport = React.forwardRef(
                   length={note.length}
                   isCurrent={false}
                   x={relativeStep * STEP_WIDTH + STEP_WIDTH / 2}
-                  y={Y_COORDINATES[1]} // 二の糸
+                  y={Y_COORDINATES[1]} // 二 of thread
                   isRest={false}
                   testId={`bunkafu-export-note-${note.step}`}
                 />
@@ -223,7 +223,9 @@ const BunkafuExport = React.forwardRef(
               <div
                 className="relative h-20"
                 style={{
-                  width: `${stepsPerLine * STEP_WIDTH}px`
+                  width: `${stepsPerLine * STEP_WIDTH}px`,
+                  lineHeight: 0,
+                  fontSize: 0
                 }}
               >
                 {/* 3本の糸 */}
