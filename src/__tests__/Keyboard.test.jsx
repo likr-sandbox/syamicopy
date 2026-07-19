@@ -36,7 +36,7 @@ vi.mock('../utils/audio', () => ({
 describe('Keyboard component', () => {
   const defaultProps = {
     tuning: 'honchoshi',
-    basePitch: 48,
+    basePitch: 60,
     playKeySound: vi.fn(),
     audioContext: {
       state: 'running',
@@ -55,38 +55,38 @@ describe('Keyboard component', () => {
     expect(keys).toHaveLength(37);
   });
 
-  it('renders pitch 81 at the top and 45 at the bottom', () => {
+  it('renders pitch 93 at the top and 57 at the bottom', () => {
     render(<Keyboard {...defaultProps} />);
     const keys = screen.getAllByTestId(/^key-/);
-    expect(keys[0]).toHaveAttribute('data-testid', 'key-81');
-    expect(keys[36]).toHaveAttribute('data-testid', 'key-45');
+    expect(keys[0]).toHaveAttribute('data-testid', 'key-93');
+    expect(keys[36]).toHaveAttribute('data-testid', 'key-57');
   });
 
   it('applies bg-nouaiBlue for black keys and bg-white for white keys', () => {
     render(<Keyboard {...defaultProps} />);
-    // MIDI 81 is A5 (white key)
-    const key81 = screen.getByTestId('key-81');
-    expect(key81.className).toContain('bg-white');
+    // MIDI 93 is A6 (white key)
+    const key93 = screen.getByTestId('key-93');
+    expect(key93.className).toContain('bg-white');
 
-    // MIDI 80 is G#5 (black key)
-    const key80 = screen.getByTestId('key-80');
-    expect(key80.className).toContain('bg-nouaiBlue');
+    // MIDI 92 is G#6 (black key)
+    const key92 = screen.getByTestId('key-92');
+    expect(key92.className).toContain('bg-nouaiBlue');
   });
 
-  it('highlights open strings correctly (honchoshi open: 48, 53, 60)', () => {
+  it('highlights open strings correctly (honchoshi open: 60, 65, 72)', () => {
     render(<Keyboard {...defaultProps} />);
-    const key48 = screen.getByTestId('key-48');
-    const key53 = screen.getByTestId('key-53');
     const key60 = screen.getByTestId('key-60');
-
-    expect(key48.className).toContain('border-l-shamiRed');
-    expect(key48.className).toContain('bg-shamiRed/10');
-    expect(screen.getByText('①')).toBeInTheDocument();
-
-    expect(key53.className).toContain('border-l-shamiRed');
-    expect(screen.getByText('②')).toBeInTheDocument();
+    const key65 = screen.getByTestId('key-65');
+    const key72 = screen.getByTestId('key-72');
 
     expect(key60.className).toContain('border-l-shamiRed');
+    expect(key60.className).toContain('bg-shamiRed/10');
+    expect(screen.getByText('①')).toBeInTheDocument();
+
+    expect(key65.className).toContain('border-l-shamiRed');
+    expect(screen.getByText('②')).toBeInTheDocument();
+
+    expect(key72.className).toContain('border-l-shamiRed');
     expect(screen.getByText('③')).toBeInTheDocument();
   });
 

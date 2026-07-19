@@ -16,7 +16,7 @@ test.describe('Real-World Composition Scenario (Tier 4)', () => {
     // 1. Create a new project
     await page.click('[data-testid="drawer-toggle-btn"]');
     await page.click('[data-testid="drawer-new-project-btn"]');
-    await page.click('[aria-label="閉じる"]');
+    await page.click('[data-testid="create-project-submit"]');
 
     await expect(
       page.locator('[data-testid="header-project-name"]')
@@ -26,11 +26,15 @@ test.describe('Real-World Composition Scenario (Tier 4)', () => {
     await page.click('[data-testid="settings-toggle-btn"]');
     await page.fill('#settings-name', 'Sakura Sakura Snippet');
     await page.fill('#settings-composer', 'Traditional');
-    await page.selectOption('#settings-tuning', 'niagari');
-    await page.selectOption('#settings-pitch', '48');
     await page.fill('#settings-bpm', '120');
     await page.fill('#settings-measures', '4');
     await page.keyboard.press('Escape');
+
+    // Adjust tuning and base pitch via Bunkafu tab
+    await page.click('[data-testid="tab-bunkafu"]');
+    await page.selectOption('[data-testid="bunkafu-tuning-select"]', 'niagari');
+    await page.selectOption('[data-testid="bunkafu-base-pitch-select"]', '48');
+    await page.click('[data-testid="tab-piano-roll"]');
 
     // Verify name updated in header
     await expect(
@@ -42,19 +46,19 @@ test.describe('Real-World Composition Scenario (Tier 4)', () => {
       .locator('[data-testid="piano-roll"]')
       .evaluate((el) => el.scrollTo(0, 300));
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 0 * 24 + 12, y: (81 - 57) * 20 + 30 },
+      position: { x: 0 * 24 + 12, y: (93 - 57) * 20 + 30 },
       force: true
     }); // A3
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 4 * 24 + 12, y: (81 - 57) * 20 + 30 },
+      position: { x: 4 * 24 + 12, y: (93 - 57) * 20 + 30 },
       force: true
     }); // A3
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 8 * 24 + 12, y: (81 - 59) * 20 + 30 },
+      position: { x: 8 * 24 + 12, y: (93 - 59) * 20 + 30 },
       force: true
     }); // B3
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 12 * 24 + 12, y: (81 - 57) * 20 + 30 },
+      position: { x: 12 * 24 + 12, y: (93 - 57) * 20 + 30 },
       force: true
     }); // A3
 

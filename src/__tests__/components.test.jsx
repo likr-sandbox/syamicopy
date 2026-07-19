@@ -234,9 +234,8 @@ describe('Shell Layout Structural Components', () => {
       { id: 'p2', name: 'Song Two' }
     ];
 
-    it('lists available projects, loaded presets, and emits load requests', () => {
+    it('lists available projects and emits select requests', () => {
       const selectMock = vi.fn();
-      const loadPresetMock = vi.fn();
       const closeMock = vi.fn();
 
       render(
@@ -246,22 +245,17 @@ describe('Shell Layout Structural Components', () => {
           projects={mockProjects}
           currentProjectId="p1"
           onSelectProject={selectMock}
-          onCreateProject={vi.fn()}
+          onOpenNewProject={vi.fn()}
           onDeleteProject={vi.fn()}
-          onLoadPreset={loadPresetMock}
         />
       );
 
       expect(screen.getByText('Song One')).toBeInTheDocument();
       expect(screen.getByText('Song Two')).toBeInTheDocument();
-      expect(screen.getByText('かえるの合唱')).toBeInTheDocument();
 
       fireEvent.click(screen.getByTestId('drawer-project-item-p2'));
       expect(selectMock).toHaveBeenCalledWith('p2');
       expect(closeMock).toHaveBeenCalledTimes(1);
-
-      fireEvent.click(screen.getByTestId('drawer-preset-item-kaeru'));
-      expect(loadPresetMock).toHaveBeenCalledWith('kaeru');
     });
 
     it('handles new project actions and delete confirm clicks', () => {
@@ -276,9 +270,8 @@ describe('Shell Layout Structural Components', () => {
           projects={mockProjects}
           currentProjectId="p1"
           onSelectProject={vi.fn()}
-          onCreateProject={createMock}
+          onOpenNewProject={createMock}
           onDeleteProject={deleteMock}
-          onLoadPreset={vi.fn()}
         />
       );
 
@@ -319,28 +312,6 @@ describe('Shell Layout Structural Components', () => {
 
       fireEvent.change(nameInput, { target: { value: 'New Name' } });
       expect(updateMock).toHaveBeenCalledWith({ name: 'New Name' });
-
-      const tuningSelect = screen.getByLabelText('調弦 (調子)');
-      fireEvent.change(tuningSelect, { target: { value: 'niagari' } });
-      expect(updateMock).toHaveBeenCalledWith({ tuning: 'niagari' });
-    });
-
-    it('emits pitch transpose operations', () => {
-      const updateMock = vi.fn();
-      render(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProj}
-          onUpdateProject={updateMock}
-        />
-      );
-
-      // Transpose up (+1 semitone)
-      fireEvent.click(screen.getByTestId('transpose-up-btn'));
-      expect(updateMock).toHaveBeenCalledWith({
-        notes: [{ id: 'n1', pitch: 61, step: 0, length: 4 }]
-      });
     });
   });
 });

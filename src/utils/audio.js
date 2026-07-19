@@ -7,7 +7,7 @@ export const createAudioContext = () => {
 };
 
 export const playShamisenSound = (ctx, pitch, duration = 1.0) => {
-  if (!ctx) return null;
+  if (!ctx || ctx.state === 'closed') return null;
   if (typeof pitch !== 'number' || Number.isNaN(pitch)) {
     return null;
   }
@@ -49,7 +49,7 @@ export const playShamisenSound = (ctx, pitch, duration = 1.0) => {
 };
 
 export const startSustainedNote = (ctx, pitch) => {
-  if (!ctx) return null;
+  if (!ctx || ctx.state === 'closed') return null;
   if (typeof pitch !== 'number' || Number.isNaN(pitch)) {
     return null;
   }

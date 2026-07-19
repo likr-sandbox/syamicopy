@@ -35,7 +35,8 @@ const BunkafuExport = React.forwardRef(
         data-testid="bunkafu-export-container"
         className="bg-washiWhite p-6 flex flex-col gap-8 w-fit"
         style={{
-          minWidth: `${4 * stepsPerMeasure * STEP_WIDTH + 80}px`
+          width: `${stepsPerLine * STEP_WIDTH + 96}px`,
+          minWidth: `${stepsPerLine * STEP_WIDTH + 96}px`
         }}
       >
         <div className="flex flex-col gap-1">
@@ -207,6 +208,9 @@ const BunkafuExport = React.forwardRef(
             <div
               key={`line-${lineIndex}`}
               className="flex relative h-20 bg-washiWhite"
+              style={{
+                width: `${stepsPerLine * STEP_WIDTH + 48}px`
+              }}
             >
               {/* 左端：糸の名称 */}
               <div className="flex flex-col justify-between h-20 w-12 border-r border-nouaiBlue/20 text-xs text-nouaiBlue/60 font-bold py-2 items-center flex-shrink-0">
@@ -216,7 +220,12 @@ const BunkafuExport = React.forwardRef(
               </div>
 
               {/* 譜面グリッド */}
-              <div className="relative flex-1 h-20">
+              <div
+                className="relative h-20"
+                style={{
+                  width: `${stepsPerLine * STEP_WIDTH}px`
+                }}
+              >
                 {/* 3本の糸 */}
                 <div
                   className="absolute w-full border-b border-nouaiBlue/40"

@@ -41,10 +41,12 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
     // Open drawer
     await ensureDrawerOpen(page);
 
-    // Select preset
-    await page.click('[data-testid="drawer-preset-item-kaeru"]');
+    // Open new project modal, switch to preset tab, select preset
+    await page.click('[data-testid="drawer-new-project-btn"]');
+    await page.click('[data-testid="new-project-tab-preset"]');
+    await page.click('[data-testid="preset-project-btn-kaeru"]');
 
-    // Verify drawer closed / project name updated in header
+    // Verify project name updated in header
     await ensureDrawerClosed(page);
     await expect(
       page.locator('[data-testid="header-project-name"]')
@@ -60,6 +62,12 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
   test('should open settings modal, adjust project attributes, and persist changes', async ({
     page
   }) => {
+    // Select tuning and base pitch via Bunkafu tab toolbar
+    await page.click('[data-testid="tab-bunkafu"]');
+    await page.selectOption('[data-testid="bunkafu-tuning-select"]', 'niagari');
+    await page.selectOption('[data-testid="bunkafu-base-pitch-select"]', '49'); // C#3
+    await page.click('[data-testid="tab-piano-roll"]');
+
     // Open settings modal
     await page.click('[data-testid="settings-toggle-btn"]');
     await expect(page.locator('[data-testid="settings-form"]')).toBeVisible();
@@ -68,10 +76,6 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
     await page.fill('#settings-name', 'My Custom Tune');
     await page.fill('#settings-composer', 'Test Composer');
     await page.fill('#settings-memo', 'Testing properties');
-
-    // Select tuning and base pitch
-    await page.selectOption('#settings-tuning', 'niagari');
-    await page.selectOption('#settings-pitch', '49'); // C#3
 
     // Fill BPM and measure count
     await page.fill('#settings-bpm', '120');
@@ -97,10 +101,18 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
     await expect(page.locator('#settings-memo')).toHaveValue(
       'Testing properties'
     );
-    await expect(page.locator('#settings-tuning')).toHaveValue('niagari');
-    await expect(page.locator('#settings-pitch')).toHaveValue('49');
     await expect(page.locator('#settings-bpm')).toHaveValue('120');
     await expect(page.locator('#settings-measures')).toHaveValue('16');
+    await page.keyboard.press('Escape');
+
+    // Verify tuning and pitch via Bunkafu tab
+    await page.click('[data-testid="tab-bunkafu"]');
+    await expect(
+      page.locator('[data-testid="bunkafu-tuning-select"]')
+    ).toHaveValue('niagari');
+    await expect(
+      page.locator('[data-testid="bunkafu-base-pitch-select"]')
+    ).toHaveValue('49');
   });
 
   test('should clamp invalid BPM inputs to valid ranges (40 to 240) [Tier 2]', async ({
@@ -155,15 +167,18 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
   test('should propagate pitch transpose to note blocks and Bunkafu tsubo positions [Tier 3]', async ({
     page
   }) => {
-    // Ensure tuning is honchoshi and base pitch is 48
-    await page.click('[data-testid="settings-toggle-btn"]');
-    await page.selectOption('#settings-tuning', 'honchoshi');
-    await page.selectOption('#settings-pitch', '48');
-    await page.keyboard.press('Escape');
+    // Ensure tuning is honchoshi and base pitch is 60 via Bunkafu tab
+    await page.click('[data-testid="tab-bunkafu"]');
+    await page.selectOption(
+      '[data-testid="bunkafu-tuning-select"]',
+      'honchoshi'
+    );
+    await page.selectOption('[data-testid="bunkafu-base-pitch-select"]', '60');
+    await page.click('[data-testid="tab-piano-roll"]');
 
-    // Place note at step 0, pitch 48 (C3)
+    // Place note at step 0, pitch 60 (C4)
     const x = 0 * 24 + 12;
-    const y = (81 - 48) * 20 + 30;
+    const y = (93 - 60) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });
@@ -171,16 +186,14 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
       page.locator('[data-testid^="note-block-"]').first()
     ).toBeVisible();
 
-    // Transpose up by 1 semitone
-    await page.click('[data-testid="settings-toggle-btn"]');
+    // Transpose up by 1 semitone directly on Piano Roll
     await page.click('[data-testid="transpose-up-btn"]');
-    await page.keyboard.press('Escape');
 
     // Assert note block shifted on grid
     // The note ID remains the same, but the top offset changes. Let's just check the state, or maybe the visual pos.
     const note = page.locator('[data-testid^="note-block-"]').first();
     const style = await note.getAttribute('style');
-    // Pitch 49 means y = (81 - 49) * 20 = 32 * 20 = 640. Pitch 48 was 33 * 20 = 660.
+    // Pitch 61 means y = (93 - 61) * 20 = 32 * 20 = 640. Pitch 60 was 33 * 20 = 660.
     expect(style).toContain('top: 640px');
 
     // Bunkafu check skipped
@@ -191,7 +204,9 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
   }) => {
     // Open drawer and load a preset
     await ensureDrawerOpen(page);
-    await page.click('[data-testid="drawer-preset-item-tulip"]');
+    await page.click('[data-testid="drawer-new-project-btn"]');
+    await page.click('[data-testid="new-project-tab-preset"]');
+    await page.click('[data-testid="preset-project-btn-tulip"]');
 
     // Change project configuration
     await page.click('[data-testid="settings-toggle-btn"]');
@@ -206,11 +221,12 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
       .count();
     expect(originalNoteCount).toBeGreaterThan(0);
 
-    // Trigger export in drawer
-    await ensureDrawerOpen(page);
+    // Trigger export in settings modal
+    await page.click('[data-testid="settings-toggle-btn"]');
     const downloadPromise = page.waitForEvent('download');
-    await page.click('[data-testid="drawer-export-btn"]');
+    await page.click('[data-testid="settings-export-btn"]');
     const download = await downloadPromise;
+    await page.keyboard.press('Escape');
 
     const localPath = './temp-export.json';
     await download.saveAs(localPath);
@@ -223,8 +239,10 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
     expect(exportedData.bpm).toBe(135);
     expect(exportedData.notes.length).toBe(originalNoteCount);
 
-    // Delete/Clear project by creating a new one
+    // Delete/Clear project by creating a new empty project
+    await ensureDrawerOpen(page);
     await page.click('[data-testid="drawer-new-project-btn"]');
+    await page.click('[data-testid="create-project-submit"]');
     await ensureDrawerClosed(page);
     await expect(
       page.locator('[data-testid="header-project-name"]')
@@ -233,10 +251,15 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
 
     // Import project JSON
     await ensureDrawerOpen(page);
+    await page.click('[data-testid="drawer-new-project-btn"]');
     const fileChooserPromise = page.waitForEvent('filechooser');
-    await page.click('[data-testid="drawer-import-btn"]');
+    await page.click('[data-testid="upload-notes-btn"]');
     const fileChooser = await fileChooserPromise;
     await fileChooser.setFiles(localPath);
+    await expect(page.locator('#new-proj-name')).toHaveValue(
+      'Import-Export Test'
+    );
+    await page.click('[data-testid="create-project-submit"]');
 
     await ensureDrawerClosed(page);
     try {

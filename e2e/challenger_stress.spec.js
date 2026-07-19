@@ -12,7 +12,7 @@ test.describe('Audio Challenger Stress Tests', () => {
   test('sustain polyphony stress: trigger and release multiple keys simultaneously', async ({
     page
   }) => {
-    const pitchesToPlay = [48, 50, 52, 53, 55, 57, 59, 60, 62, 64];
+    const pitchesToPlay = [57, 59, 60, 62, 64, 65, 67, 69, 71, 72];
 
     await page.evaluate(() => {
       window.__audioAudit = [];
@@ -47,7 +47,7 @@ test.describe('Audio Challenger Stress Tests', () => {
   });
 
   test('slide pointer stress with real mouse movement', async ({ page }) => {
-    const pitchesToSlide = [60, 59, 57, 55, 53, 52, 50, 48]; // Downwards on the keyboard
+    const pitchesToSlide = [69, 67, 65, 64, 62, 60, 59, 57]; // Downwards on the keyboard
 
     await page.evaluate(() => {
       window.__audioAudit = [];
@@ -94,7 +94,7 @@ test.describe('Audio Challenger Stress Tests', () => {
   test('unmount memory leak: switching tabs while sustaining note leaks oscillator', async ({
     page
   }) => {
-    const keyLocator = page.locator('[data-testid="key-48"]');
+    const keyLocator = page.locator('[data-testid="key-60"]');
     await expect(keyLocator).toBeVisible();
 
     await page.evaluate(() => {

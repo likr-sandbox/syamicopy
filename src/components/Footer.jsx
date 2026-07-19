@@ -64,13 +64,16 @@ export function Footer({
         )}
       </button>
 
-      <div className="flex gap-4 text-xs font-mono text-nouaiBlue/75">
+      <div className="flex gap-4 text-xs font-mono text-nouaiBlue/75 items-center">
         <div data-testid="current-measure-display">
-          {JA.footer.currentMeasure.replace('{measure}', String(measure))}
+          {currentStep === -1
+            ? '小節: -'
+            : JA.footer.currentMeasure.replace('{measure}', String(measure))}
         </div>
+        <span className="text-nouaiBlue/30">|</span>
         <div data-testid="current-step-display">
           {currentStep === -1
-            ? '-1'
+            ? 'ステップ: -'
             : JA.footer.currentStep.replace('{step}', String(currentStep))}
         </div>
         <div data-testid="current-tempo-display" className="hidden sm:block">

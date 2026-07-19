@@ -9,21 +9,10 @@ export function Drawer({
   projects,
   currentProjectId,
   onSelectProject,
-  onCreateProject,
-  onDeleteProject,
-  onLoadPreset,
-  currentProject
+  onOpenNewProject,
+  onDeleteProject
 }) {
-  const fileInputRef = useRef(null);
-
   if (!isOpen) return null;
-
-  const handleCreateNew = () => {
-    onCreateProject({
-      name: JA.header.projectNamePlaceholder,
-      notes: []
-    });
-  };
 
   const handleDelete = (e, id, name) => {
     e.stopPropagation();
@@ -31,51 +20,6 @@ export function Drawer({
     if (window.confirm(message)) {
       onDeleteProject(id);
     }
-  };
-
-  const handleExport = () => {
-    if (!currentProject) return;
-    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(currentProject, null, 2)
-    )}`;
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute(
-      'download',
-      `${currentProject.name || 'project'}.json`
-    );
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleImport = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const parsed = JSON.parse(event.target.result);
-        if (parsed && typeof parsed === 'object') {
-          if (!Array.isArray(parsed.notes)) {
-            parsed.notes = [];
-          }
-          onCreateProject(parsed);
-          alert(JA.importExport.importSuccess);
-        } else {
-          alert(JA.importExport.importFailed);
-        }
-      } catch {
-        alert(JA.importExport.importFailed);
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = '';
   };
 
   return (
@@ -114,21 +58,27 @@ export function Drawer({
           </IconButton>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
           <button
             type="button"
             data-testid="drawer-new-project-btn"
-            onClick={handleCreateNew}
-            className="w-full py-2 bg-shamiRed text-washiWhite font-bold rounded hover:bg-shamiRed/95 transition-all text-sm shadow-sm"
+            onClick={() => {
+              onOpenNewProject();
+              onClose();
+            }}
+            className="w-full py-2.5 bg-shamiRed text-washiWhite font-bold rounded hover:bg-shamiRed/95 transition-all text-sm shadow-sm flex-shrink-0"
           >
             {JA.project.newProjectBtn}
           </button>
 
-          <div>
+          <div className="flex-1 flex flex-col min-h-0">
             <h3 className="text-xs font-bold text-nouaiBlue/55 tracking-wider uppercase mb-2">
               マイプロジェクト ({projects.length})
             </h3>
-            <div className="space-y-1 max-h-48 overflow-y-auto border border-nouaiBlue/10 rounded bg-white">
+            <div
+              className="flex-1 overflow-y-auto border border-nouaiBlue/10 rounded bg-white"
+              data-testid="drawer-projects-list"
+            >
               {projects.map((proj) => {
                 const isCurrent = proj.id === currentProjectId;
                 return (
@@ -176,60 +126,6 @@ export function Drawer({
                 );
               })}
             </div>
-          </div>
-
-          <div>
-            <h3 className="text-xs font-bold text-nouaiBlue/55 tracking-wider uppercase mb-2">
-              {JA.common.preset}
-            </h3>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(PRESETS).map(([key, value]) => (
-                <button
-                  key={key}
-                  type="button"
-                  data-testid={`drawer-preset-item-${key}`}
-                  onClick={() => {
-                    onLoadPreset(key);
-                    onClose();
-                  }}
-                  className="p-2 border border-nouaiBlue/10 hover:border-shamiRed hover:bg-shamiRed/5 text-left text-xs rounded transition-all truncate text-nouaiBlue font-medium"
-                >
-                  {value.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="border-t border-nouaiBlue/10 pt-4">
-            <h3 className="text-xs font-bold text-nouaiBlue/55 tracking-wider uppercase mb-2">
-              {JA.importExport.title}
-            </h3>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                data-testid="drawer-export-btn"
-                onClick={handleExport}
-                className="flex-1 py-1.5 border border-nouaiBlue text-nouaiBlue rounded text-xs hover:bg-nouaiBlue hover:text-washiWhite transition-all font-semibold"
-              >
-                {JA.importExport.exportBtn}
-              </button>
-              <button
-                type="button"
-                data-testid="drawer-import-btn"
-                onClick={handleImportClick}
-                className="flex-1 py-1.5 border border-nouaiBlue text-nouaiBlue rounded text-xs hover:bg-nouaiBlue hover:text-washiWhite transition-all font-semibold"
-              >
-                {JA.importExport.importBtn}
-              </button>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              className="hidden"
-              data-testid="drawer-file-input"
-            />
           </div>
         </div>
       </div>

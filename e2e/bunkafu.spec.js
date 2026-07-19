@@ -11,17 +11,20 @@ test.describe('Bunkafu Score View and Image Export (Tiers 1 & 2)', () => {
   test('should map notes to correct strings and tsubo numbers in Bunkafu view', async ({
     page
   }) => {
-    // Ensure tuning is set to honchoshi (open strings: C3=48, F3=53, C4=60)
-    await page.click('[data-testid="settings-toggle-btn"]');
-    await page.selectOption('[data-testid="settings-tuning"]', 'honchoshi');
-    await page.selectOption('[data-testid="settings-base-pitch"]', '48');
-    await page.click('[data-testid="settings-save"]');
+    // Ensure tuning is set to honchoshi via Bunkafu tab selectors
+    await page.click('[data-testid="tab-bunkafu"]');
+    await page.selectOption(
+      '[data-testid="bunkafu-tuning-select"]',
+      'honchoshi'
+    );
+    await page.selectOption('[data-testid="bunkafu-base-pitch-select"]', '60');
+    await page.click('[data-testid="tab-piano-roll"]');
 
     // Input sample pitches in Editor
-    await page.click('[data-testid="grid-cell-0-48"]'); // C3 (String 0, Open)
-    await page.click('[data-testid="grid-cell-4-53"]'); // F3 (String 1, Open)
-    await page.click('[data-testid="grid-cell-8-54"]'); // F#3 (String 1, Tsubo 1)
-    await page.click('[data-testid="grid-cell-12-60"]'); // C4 (String 2, Open)
+    await page.click('[data-testid="grid-cell-0-60"]'); // C4 (String 0, Open)
+    await page.click('[data-testid="grid-cell-4-65"]'); // F4 (String 1, Open)
+    await page.click('[data-testid="grid-cell-8-66"]'); // F#4 (String 1, Tsubo 1)
+    await page.click('[data-testid="grid-cell-12-72"]'); // C5 (String 2, Open)
 
     // Switch to Bunkafu Tab
     await page.click('[data-testid="tab-bunkafu"]');
@@ -141,15 +144,18 @@ test.describe('Bunkafu Score View and Image Export (Tiers 1 & 2)', () => {
   test('should recalculate tsubo positions and string index when tuning changes [Tier 3]', async ({
     page
   }) => {
-    // Set initial settings: honchoshi, base pitch 48
-    await page.click('[data-testid="settings-toggle-btn"]');
-    await page.selectOption('[data-testid="settings-tuning"]', 'honchoshi');
-    await page.selectOption('[data-testid="settings-base-pitch"]', '48');
-    await page.click('[data-testid="settings-save"]');
+    // Set initial settings: honchoshi, base pitch 60 via Bunkafu tab
+    await page.click('[data-testid="tab-bunkafu"]');
+    await page.selectOption(
+      '[data-testid="bunkafu-tuning-select"]',
+      'honchoshi'
+    );
+    await page.selectOption('[data-testid="bunkafu-base-pitch-select"]', '60');
+    await page.click('[data-testid="tab-piano-roll"]');
 
-    // Place note 53 at step 0, and note 55 at step 4
-    await page.click('[data-testid="grid-cell-0-53"]');
-    await page.click('[data-testid="grid-cell-4-55"]');
+    // Place note 65 at step 0, and note 67 at step 4
+    await page.click('[data-testid="grid-cell-0-65"]');
+    await page.click('[data-testid="grid-cell-4-67"]');
 
     // Toggle to Bunkafu view
     await page.click('[data-testid="tab-bunkafu"]');
@@ -170,10 +176,8 @@ test.describe('Bunkafu Score View and Image Export (Tiers 1 & 2)', () => {
       page.locator('[data-testid="bunkafu-note-4"]')
     ).toHaveAttribute('data-string-index', '1');
 
-    // Shift tuning to niagari (strings: 48, 55, 60)
-    await page.click('[data-testid="settings-toggle-btn"]');
-    await page.selectOption('[data-testid="settings-tuning"]', 'niagari');
-    await page.click('[data-testid="settings-save"]');
+    // Shift tuning to niagari directly on Bunkafu view
+    await page.selectOption('[data-testid="bunkafu-tuning-select"]', 'niagari');
 
     // Under Niagari:
     // Pitch 53 is mapped to 一の糸 (string index 0, 5 semitones higher -> tsubo "4")

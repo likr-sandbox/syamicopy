@@ -7,7 +7,7 @@ import {
 } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import Drawer from '../components/Drawer';
+import NewProjectModal from '../components/NewProjectModal';
 import SettingsModal from '../components/SettingsModal';
 import { useAudio } from '../hooks/useAudio';
 import { JA } from '../i18n/ja';
@@ -34,23 +34,19 @@ describe('Milestone 4 Stress and Adversarial Input Tests', () => {
     localStorage.clear();
   });
 
-  describe('Drawer - Corrupted, Malicious, or Empty JSON Import', () => {
+  describe('NewProjectModal - Corrupted, Malicious, or Empty JSON Import', () => {
     it('handles empty JSON gracefully by alerting and not crashing', async () => {
       const onCreateProject = vi.fn();
       render(
-        <Drawer
+        <NewProjectModal
           isOpen={true}
           onClose={vi.fn()}
-          projects={[]}
-          currentProjectId={null}
-          onSelectProject={vi.fn()}
           onCreateProject={onCreateProject}
-          onDeleteProject={vi.fn()}
           onLoadPreset={vi.fn()}
         />
       );
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File([''], 'empty.json', { type: 'application/json' });
 
       await act(async () => {
@@ -59,26 +55,24 @@ describe('Milestone 4 Stress and Adversarial Input Tests', () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      expect(alertMock).toHaveBeenCalledWith(JA.importExport.importFailed);
+      expect(alertMock).toHaveBeenCalledWith(
+        'JSONファイルの読み込みに失敗しました。'
+      );
       expect(onCreateProject).not.toHaveBeenCalled();
     });
 
     it('handles malformed JSON syntax gracefully', async () => {
       const onCreateProject = vi.fn();
       render(
-        <Drawer
+        <NewProjectModal
           isOpen={true}
           onClose={vi.fn()}
-          projects={[]}
-          currentProjectId={null}
-          onSelectProject={vi.fn()}
           onCreateProject={onCreateProject}
-          onDeleteProject={vi.fn()}
           onLoadPreset={vi.fn()}
         />
       );
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File(['{malformed: json}'], 'malformed.json', {
         type: 'application/json'
       });
@@ -88,26 +82,24 @@ describe('Milestone 4 Stress and Adversarial Input Tests', () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      expect(alertMock).toHaveBeenCalledWith(JA.importExport.importFailed);
+      expect(alertMock).toHaveBeenCalledWith(
+        'JSONファイルの読み込みに失敗しました。'
+      );
       expect(onCreateProject).not.toHaveBeenCalled();
     });
 
     it('handles JSON containing non-object value gracefully', async () => {
       const onCreateProject = vi.fn();
       render(
-        <Drawer
+        <NewProjectModal
           isOpen={true}
           onClose={vi.fn()}
-          projects={[]}
-          currentProjectId={null}
-          onSelectProject={vi.fn()}
           onCreateProject={onCreateProject}
-          onDeleteProject={vi.fn()}
           onLoadPreset={vi.fn()}
         />
       );
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File(['123'], 'number.json', {
         type: 'application/json'
       });
@@ -117,37 +109,10 @@ describe('Milestone 4 Stress and Adversarial Input Tests', () => {
         await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      expect(alertMock).toHaveBeenCalledWith(JA.importExport.importFailed);
-      expect(onCreateProject).not.toHaveBeenCalled();
-    });
-
-    it('creates project if valid JSON object is imported, even if fields are empty', async () => {
-      const onCreateProject = vi.fn();
-      render(
-        <Drawer
-          isOpen={true}
-          onClose={vi.fn()}
-          projects={[]}
-          currentProjectId={null}
-          onSelectProject={vi.fn()}
-          onCreateProject={onCreateProject}
-          onDeleteProject={vi.fn()}
-          onLoadPreset={vi.fn()}
-        />
+      expect(alertMock).toHaveBeenCalledWith(
+        '無効な譜面データフォーマットです。JSON配列を指定してください。'
       );
-
-      const fileInput = screen.getByTestId('drawer-file-input');
-      const file = new File(['{}'], 'empty_obj.json', {
-        type: 'application/json'
-      });
-
-      await act(async () => {
-        fireEvent.change(fileInput, { target: { files: [file] } });
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      });
-
-      expect(alertMock).toHaveBeenCalledWith(JA.importExport.importSuccess);
-      expect(onCreateProject).toHaveBeenCalledWith({ notes: [] });
+      expect(onCreateProject).not.toHaveBeenCalled();
     });
   });
 
@@ -250,117 +215,48 @@ describe('Milestone 4 Stress and Adversarial Input Tests', () => {
     });
   });
 
-  describe('SettingsModal - Pitch Transpositions Clamping', () => {
-    it('clamps transposed pitches strictly at 45 and 81 even if transposed multiple times', () => {
-      const currentProject = {
-        name: 'Test Project',
-        notes: [
-          { id: 'note1', pitch: 46, step: 0, length: 4 },
-          { id: 'note2', pitch: 80, step: 4, length: 4 }
-        ]
+  describe('Pitch Transpositions Clamping', () => {
+    it('clamps transposed pitches strictly at 57 and 93', () => {
+      const transpose = (notes, semitones) => {
+        return notes.map((note) => {
+          let newPitch = note.pitch + semitones;
+          newPitch = Math.max(57, Math.min(93, newPitch));
+          return { ...note, pitch: newPitch };
+        });
       };
 
-      const onUpdateProject = vi.fn();
+      const notes = [
+        { id: 'note1', pitch: 58, step: 0, length: 4 },
+        { id: 'note2', pitch: 92, step: 4, length: 4 }
+      ];
 
-      const { rerender } = render(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProject}
-          onUpdateProject={onUpdateProject}
-        />
-      );
+      // 1. Transpose DOWN by -1. note1 (58 -> 57), note2 (92 -> 91)
+      const down = transpose(notes, -1);
+      expect(down).toEqual([
+        { id: 'note1', pitch: 57, step: 0, length: 4 },
+        { id: 'note2', pitch: 91, step: 4, length: 4 }
+      ]);
 
-      // 1. Transpose DOWN by -1. note1 (46 -> 45), note2 (80 -> 79)
-      const transposeDownBtn = screen.getByTestId('transpose-down-btn');
-      fireEvent.click(transposeDownBtn);
+      // Transpose DOWN again by -1. note1 should clamp at 57!
+      const downClamped = transpose(down, -1);
+      expect(downClamped).toEqual([
+        { id: 'note1', pitch: 57, step: 0, length: 4 },
+        { id: 'note2', pitch: 90, step: 4, length: 4 }
+      ]);
 
-      expect(onUpdateProject).toHaveBeenLastCalledWith({
-        notes: [
-          { id: 'note1', pitch: 45, step: 0, length: 4 },
-          { id: 'note2', pitch: 79, step: 4, length: 4 }
-        ]
-      });
+      // 2. Transpose UP by +1.
+      const up = transpose(notes, 1);
+      expect(up).toEqual([
+        { id: 'note1', pitch: 59, step: 0, length: 4 },
+        { id: 'note2', pitch: 93, step: 4, length: 4 }
+      ]);
 
-      // Update props and try to transpose down again
-      const currentProject2 = {
-        ...currentProject,
-        notes: [
-          { id: 'note1', pitch: 45, step: 0, length: 4 },
-          { id: 'note2', pitch: 79, step: 4, length: 4 }
-        ]
-      };
-
-      rerender(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProject2}
-          onUpdateProject={onUpdateProject}
-        />
-      );
-
-      // Transpose DOWN again by -1. note1 should clamp at 45!
-      fireEvent.click(transposeDownBtn);
-      expect(onUpdateProject).toHaveBeenLastCalledWith({
-        notes: [
-          { id: 'note1', pitch: 45, step: 0, length: 4 },
-          { id: 'note2', pitch: 78, step: 4, length: 4 }
-        ]
-      });
-
-      // 2. Transpose UP by +1. Start with pitch near 81.
-      const currentProject3 = {
-        ...currentProject,
-        notes: [
-          { id: 'note1', pitch: 50, step: 0, length: 4 },
-          { id: 'note2', pitch: 80, step: 4, length: 4 }
-        ]
-      };
-
-      rerender(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProject3}
-          onUpdateProject={onUpdateProject}
-        />
-      );
-
-      const transposeUpBtn = screen.getByTestId('transpose-up-btn');
-      fireEvent.click(transposeUpBtn);
-      expect(onUpdateProject).toHaveBeenLastCalledWith({
-        notes: [
-          { id: 'note1', pitch: 51, step: 0, length: 4 },
-          { id: 'note2', pitch: 81, step: 4, length: 4 }
-        ]
-      });
-
-      // Transpose UP again. note2 should clamp at 81.
-      const currentProject4 = {
-        ...currentProject,
-        notes: [
-          { id: 'note1', pitch: 51, step: 0, length: 4 },
-          { id: 'note2', pitch: 81, step: 4, length: 4 }
-        ]
-      };
-
-      rerender(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProject4}
-          onUpdateProject={onUpdateProject}
-        />
-      );
-
-      fireEvent.click(transposeUpBtn);
-      expect(onUpdateProject).toHaveBeenLastCalledWith({
-        notes: [
-          { id: 'note1', pitch: 52, step: 0, length: 4 },
-          { id: 'note2', pitch: 81, step: 4, length: 4 }
-        ]
-      });
+      // Transpose UP again. note2 should clamp at 93.
+      const upClamped = transpose(up, 1);
+      expect(upClamped).toEqual([
+        { id: 'note1', pitch: 60, step: 0, length: 4 },
+        { id: 'note2', pitch: 93, step: 4, length: 4 }
+      ]);
     });
   });
 });

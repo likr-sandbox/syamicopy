@@ -156,7 +156,10 @@ export const NoteBlock = ({
     stateRef.current.isDragging = false;
     setDragOffset({ x: 0, y: 0 });
 
-    if (distance < 3) {
+    const isTouch = e.pointerType === 'touch';
+    const tapThreshold = isTouch ? 2 : 2;
+
+    if (distance <= tapThreshold) {
       // Tap to delete
       deleteNote(note.id);
     } else {

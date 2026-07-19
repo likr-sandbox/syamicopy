@@ -12,7 +12,7 @@ describe('Grid component', () => {
     timeSignature: { numerator: 4, denominator: 4 },
     measureCount: 8,
     tuning: 'honchoshi',
-    basePitch: 48,
+    basePitch: 60,
     playKeySound: vi.fn(),
     currentStep: -1
   };
@@ -29,7 +29,7 @@ describe('Grid component', () => {
     // 8 measures * 16 steps/measure = 128 steps. Width = 128 * 24 = 3072px.
     expect(grid.style.width).toBe('3072px');
 
-    // 37 rows correspond to pitches 81 down to 45
+    // 37 rows correspond to pitches 93 down to 57
     const rows = grid.querySelectorAll('.border-b');
     // Note: includes the header bar border if styled with border-b, plus 37 rows
     expect(rows.length).toBeGreaterThanOrEqual(37);
@@ -60,8 +60,8 @@ describe('Grid component', () => {
       toJSON: () => {}
     }));
 
-    // Click at step 4 (4 * 24 = 96px), row 21 (21 * 20 = 420px, corresponding to pitch 81 - 21 = 60)
-    fireEvent.click(content, { clientX: 96, clientY: 420 });
+    // Click at step 4 (4 * 24 = 96px), row 33 (33 * 20 = 660px, corresponding to pitch 93 - 33 = 60)
+    fireEvent.click(content, { clientX: 96, clientY: 660 });
 
     expect(defaultProps.addNote).toHaveBeenCalledWith({
       pitch: 60,

@@ -26,7 +26,7 @@ export const useAudio = (notes, bpm, timeSignature, measureCount) => {
   }, []);
 
   const getAudioContext = useCallback(() => {
-    if (!audioCtxRef.current) {
+    if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
       audioCtxRef.current = createAudioContext();
     }
     return audioCtxRef.current;

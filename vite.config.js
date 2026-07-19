@@ -15,12 +15,14 @@ export default defineConfig({
         'favicon.svg',
         'icon-192.png',
         'icon-512.png',
-        'og-image.png'
+        'og-image.png',
+        'screenshot-desktop.png',
+        'screenshot-mobile.png'
       ],
       manifest: {
-        name: 'シャミコピー',
-        short_name: 'シャミコピー',
-        description: '三味線文化譜作成アプリ - Piano Roll & Bunkafu Editor',
+        name: 'Syamicopy',
+        short_name: 'Syamicopy',
+        description: '三味線文化譜作成アプリ',
         theme_color: '#8B2500',
         background_color: '#FDFBF7',
         display: 'standalone',
@@ -40,7 +42,21 @@ export default defineConfig({
             src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'maskable'
+          }
+        ],
+        screenshots: [
+          {
+            src: 'screenshot-desktop.png',
+            sizes: '1280x800',
+            type: 'image/png',
+            form_factor: 'wide'
+          },
+          {
+            src: 'screenshot-mobile.png',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow'
           }
         ]
       },

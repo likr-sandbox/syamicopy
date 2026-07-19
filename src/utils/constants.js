@@ -1,8 +1,8 @@
 export const ROW_HEIGHT = 20;
 export const STEP_WIDTH = 24;
 
-export const MIN_PITCH = 45; // A2
-export const MAX_PITCH = 81; // A5
+export const MIN_PITCH = 57; // A3
+export const MAX_PITCH = 93; // A6
 
 export const DEFAULT_BPM = 100;
 export const DEFAULT_TUNING = 'honchoshi';

@@ -29,7 +29,7 @@ describe('NoteBlock component', () => {
     updateNote: vi.fn(),
     totalSteps: 128,
     tuning: 'honchoshi',
-    basePitch: 48,
+    basePitch: 60,
     playKeySound: vi.fn()
   };
 
@@ -44,17 +44,17 @@ describe('NoteBlock component', () => {
 
     // Position checks
     // left: 8 * 24 = 192px
-    // top: (81 - 60) * 20 = 21 * 20 = 420px
+    // top: (93 - 60) * 20 = 33 * 20 = 660px
     // width: 4 * 24 = 96px
     expect(block.style.left).toBe('192px');
-    expect(block.style.top).toBe('420px');
+    expect(block.style.top).toBe('660px');
     expect(block.style.width).toBe('96px');
 
     // Label: pitch label + shamisen label
     // Pitch 60 is C4
     expect(screen.getByText('C4')).toBeInTheDocument();
-    // honchoshi open 48, 53, 60. Pitch 60 is string index 2, tsubo '0' -> '3-0'
-    expect(screen.getByText('3-0')).toBeInTheDocument();
+    // honchoshi open 60, 65, 72. Pitch 60 is string index 0, tsubo '0' -> '1-0'
+    expect(screen.getByText('1-0')).toBeInTheDocument();
   });
 
   it('triggers deleteNote when tapped/clicked without movement', () => {
@@ -65,6 +65,43 @@ describe('NoteBlock component', () => {
     fireEvent.pointerUp(block, { clientX: 100, clientY: 100 });
 
     expect(defaultProps.deleteNote).toHaveBeenCalledWith('note-1');
+  });
+
+  it('triggers deleteNote on touch pointer when movement is <= 2px', () => {
+    render(<NoteBlock {...defaultProps} />);
+    const block = screen.getByTestId('note-block-note-1');
+
+    fireEvent.pointerDown(block, {
+      clientX: 100,
+      clientY: 100,
+      pointerType: 'touch'
+    });
+    fireEvent.pointerUp(block, {
+      clientX: 102,
+      clientY: 100,
+      pointerType: 'touch'
+    });
+
+    expect(defaultProps.deleteNote).toHaveBeenCalledWith('note-1');
+  });
+
+  it('does NOT trigger deleteNote on touch pointer when movement is > 2px', () => {
+    render(<NoteBlock {...defaultProps} />);
+    const block = screen.getByTestId('note-block-note-1');
+
+    fireEvent.pointerDown(block, {
+      clientX: 100,
+      clientY: 100,
+      pointerType: 'touch'
+    });
+    fireEvent.pointerUp(block, {
+      clientX: 200,
+      clientY: 100,
+      pointerType: 'touch'
+    });
+
+    expect(defaultProps.deleteNote).not.toHaveBeenCalled();
+    expect(defaultProps.updateNote).toHaveBeenCalled();
   });
 
   it('updates step and pitch on drag end', () => {

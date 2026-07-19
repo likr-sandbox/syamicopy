@@ -13,10 +13,13 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
     page
   }) => {
     const display = page.locator('[data-testid="current-step-display"]');
-    await expect(display).toHaveText('-1'); // Playback starts stopped
+    await expect(display).toHaveText('ステップ: -'); // Playback starts stopped
 
     // Toggle play state
     await page.click('[data-testid="play-toggle-btn"]');
+    await expect(page.locator('[data-testid="play-toggle-btn"]')).toHaveText(
+      /停止/
+    );
 
     // Current step increments while playing
     await expect(async () => {
@@ -28,7 +31,7 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
 
     // Click play/stop to stop playback
     await page.click('[data-testid="play-toggle-btn"]');
-    await expect(display).toHaveText('-1');
+    await expect(display).toHaveText('ステップ: -');
   });
 
   test('should trigger correct audio pitches matching notes as the playhead advances', async ({
@@ -41,7 +44,7 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
 
     // Add note on step 0, MIDI pitch 72 (C5)
     const x = 0 * 24 + 12;
-    const y = (81 - 72) * 20 + 30;
+    const y = (93 - 72) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });
@@ -78,7 +81,7 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
 
     // Place a note at step 60, pitch 72
     const x = 60 * 24 + 12;
-    const y = (81 - 72) * 20 + 30;
+    const y = (93 - 72) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });

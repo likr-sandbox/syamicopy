@@ -17,8 +17,8 @@ test.describe('PWA Capabilities (Tiers 1 & 2)', () => {
     expect(response.status()).toBe(200);
 
     const manifest = await response.json();
-    expect(manifest.name).toBe('シャミコピー');
-    expect(manifest.short_name).toBe('シャミコピー');
+    expect(manifest.name).toBe('Syamicopy');
+    expect(manifest.short_name).toBe('Syamicopy');
     expect(manifest.display).toBe('standalone');
   });
 

@@ -19,7 +19,7 @@ test.describe('Piano Roll Grid and Keyboard Editor (Tiers 1 & 2)', () => {
 
     // Click grid cell to place note (step 4, MIDI pitch 70)
     const x = 4 * 24 + 12;
-    const y = (81 - 70) * 20 + 30;
+    const y = (93 - 70) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });
@@ -71,7 +71,7 @@ test.describe('Piano Roll Grid and Keyboard Editor (Tiers 1 & 2)', () => {
     page
   }) => {
     // First click puts a note
-    await page.locator('[data-testid="grid-cell-8-52"]').click({ force: true });
+    await page.locator('[data-testid="grid-cell-8-60"]').click({ force: true });
     const note = page.locator('[data-testid^="note-block-"]').first();
     await expect(note).toBeVisible();
 
@@ -79,7 +79,7 @@ test.describe('Piano Roll Grid and Keyboard Editor (Tiers 1 & 2)', () => {
     // Actually the app prevents duplication but does not delete on grid click, it's click on note to delete.
     // Let's just click on the grid at same pos again.
     await page
-      .locator('[data-testid="grid-cell-8-52"]')
+      .locator('[data-testid="grid-cell-8-60"]')
       .evaluate((el) => el.click());
     const notes = page.locator('[data-testid^="note-block-"]');
     await expect(notes).toHaveCount(1);
@@ -95,7 +95,7 @@ test.describe('Piano Roll Grid and Keyboard Editor (Tiers 1 & 2)', () => {
 
     // Add note near the end: step 60, pitch 70
     const x = 60 * 24 + 12;
-    const y = (81 - 70) * 20 + 30;
+    const y = (93 - 70) * 20 + 30;
     await page.locator('[data-testid="piano-roll"]').evaluate((el) => {
       if (el) el.scrollLeft = 1200;
     });

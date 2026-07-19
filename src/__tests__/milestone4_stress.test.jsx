@@ -9,6 +9,8 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import { Drawer } from '../components/Drawer';
+import NewProjectModal from '../components/NewProjectModal';
+import PianoRoll from '../components/PianoRoll/PianoRoll';
 import { SettingsModal } from '../components/SettingsModal';
 import { useAudio } from '../hooks/useAudio';
 import * as audioUtils from '../utils/audio';
@@ -62,7 +64,7 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
     vi.restoreAllMocks();
   });
 
-  describe('Adversarial JSON Import in Drawer', () => {
+  describe('Adversarial JSON Import in NewProjectModal', () => {
     const setupFileReaderMock = (fileContent, shouldSucceed = true) => {
       class MockFileReader {
         readAsText(_file) {
@@ -84,18 +86,15 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
       setupFileReaderMock('');
       const onCreateProject = vi.fn();
       render(
-        <Drawer
+        <NewProjectModal
           isOpen={true}
           onClose={vi.fn()}
-          projects={[]}
           onCreateProject={onCreateProject}
-          onSelectProject={vi.fn()}
-          onDeleteProject={vi.fn()}
           onLoadPreset={vi.fn()}
         />
       );
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File([], 'empty.json', { type: 'application/json' });
 
       await act(async () => {
@@ -112,18 +111,15 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
       setupFileReaderMock('{ "invalid": json }');
       const onCreateProject = vi.fn();
       render(
-        <Drawer
+        <NewProjectModal
           isOpen={true}
           onClose={vi.fn()}
-          projects={[]}
           onCreateProject={onCreateProject}
-          onSelectProject={vi.fn()}
-          onDeleteProject={vi.fn()}
           onLoadPreset={vi.fn()}
         />
       );
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File([], 'malformed.json', { type: 'application/json' });
 
       await act(async () => {
@@ -139,18 +135,15 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
       setupFileReaderMock('null');
       const onCreateProject = vi.fn();
       render(
-        <Drawer
+        <NewProjectModal
           isOpen={true}
           onClose={vi.fn()}
-          projects={[]}
           onCreateProject={onCreateProject}
-          onSelectProject={vi.fn()}
-          onDeleteProject={vi.fn()}
           onLoadPreset={vi.fn()}
         />
       );
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File([], 'null.json', { type: 'application/json' });
 
       await act(async () => {
@@ -180,7 +173,10 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
       fireEvent.click(screen.getByTestId('drawer-toggle-btn'));
       expect(screen.getByTestId('drawer-overlay')).toBeInTheDocument();
 
-      const fileInput = screen.getByTestId('drawer-file-input');
+      // Open NewProjectModal
+      fireEvent.click(screen.getByTestId('drawer-new-project-btn'));
+
+      const fileInput = screen.getByTestId('notes-file-input');
       const file = new File([], 'bad_project.json', {
         type: 'application/json'
       });
@@ -274,107 +270,23 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
     });
   });
 
-  describe('SettingsModal Note Pitch Transpositions', () => {
-    it('successfully clamps pitches at 45 and 81 even if transposed multiple times', () => {
-      const onUpdateProject = vi.fn();
-      const currentProject = {
-        name: 'Test Project',
-        notes: [
-          { id: 'note-1', pitch: 80 },
-          { id: 'note-2', pitch: 46 }
-        ]
-      };
-
-      const { rerender } = render(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProject}
-          onUpdateProject={onUpdateProject}
-        />
-      );
-
-      // Transpose up (+1)
-      fireEvent.click(screen.getByTestId('transpose-up-btn'));
-      expect(onUpdateProject).toHaveBeenCalledWith({
-        notes: [
-          { id: 'note-1', pitch: 81 },
-          { id: 'note-2', pitch: 47 }
-        ]
-      });
-
-      // Now set note-1 at 81, and transpose up again (+1)
-      const currentProjectAtUpper = {
-        name: 'Test Project',
-        notes: [{ id: 'note-1', pitch: 81 }]
-      };
-
-      rerender(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProjectAtUpper}
-          onUpdateProject={onUpdateProject}
-        />
-      );
-
-      onUpdateProject.mockClear();
-      fireEvent.click(screen.getByTestId('transpose-up-btn'));
-      // Pitch remains clamped at 81
-      expect(onUpdateProject).toHaveBeenCalledWith({
-        notes: [{ id: 'note-1', pitch: 81 }]
-      });
-
-      // Now set note-2 at 45, and transpose down again (-1)
-      const currentProjectAtLower = {
-        name: 'Test Project',
-        notes: [{ id: 'note-2', pitch: 45 }]
-      };
-
-      rerender(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProjectAtLower}
-          onUpdateProject={onUpdateProject}
-        />
-      );
-
-      onUpdateProject.mockClear();
-      fireEvent.click(screen.getByTestId('transpose-down-btn'));
-      // Pitch remains clamped at 45
-      expect(onUpdateProject).toHaveBeenCalledWith({
-        notes: [{ id: 'note-2', pitch: 45 }]
-      });
-    });
-
-    it('corrects and clamps notes that are already out of bounds upon transposition', () => {
-      const onUpdateProject = vi.fn();
-      const currentProject = {
-        name: 'Test Project',
-        notes: [
-          { id: 'note-1', pitch: 90 }, // Out of bounds high
-          { id: 'note-2', pitch: 40 } // Out of bounds low
-        ]
-      };
-
+  describe('PianoRoll Note Pitch Transpositions', () => {
+    it('successfully triggers transpose callback on click', () => {
+      const onTranspose = vi.fn();
       render(
-        <SettingsModal
-          isOpen={true}
-          onClose={vi.fn()}
-          currentProject={currentProject}
-          onUpdateProject={onUpdateProject}
+        <PianoRoll
+          notes={[]}
+          onTranspose={onTranspose}
+          timeSignature={{ numerator: 4, denominator: 4 }}
+          measureCount={8}
         />
       );
 
-      // Transpose up (+1) -> note-1 (90+1=91) clamps to 81, note-2 (40+1=41) clamps to 45
       fireEvent.click(screen.getByTestId('transpose-up-btn'));
-      expect(onUpdateProject).toHaveBeenCalledWith({
-        notes: [
-          { id: 'note-1', pitch: 81 },
-          { id: 'note-2', pitch: 45 }
-        ]
-      });
+      expect(onTranspose).toHaveBeenCalledWith(1);
+
+      fireEvent.click(screen.getByTestId('transpose-down-btn'));
+      expect(onTranspose).toHaveBeenCalledWith(-1);
     });
   });
 
@@ -428,7 +340,10 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
       assertPlaying(true);
 
       openDrawer();
-      fireEvent.click(screen.getByTestId('drawer-preset-item-sakura'));
+      fireEvent.click(screen.getByTestId('drawer-new-project-btn'));
+      // Switch tab and click preset item in NewProjectModal
+      fireEvent.click(screen.getByTestId('new-project-tab-preset'));
+      fireEvent.click(screen.getByTestId('preset-project-btn-sakura'));
       assertPlaying(false); // Should be stopped
 
       // 2. Check stop on creating new project
@@ -437,6 +352,8 @@ describe('Milestone 4 Layout & State Hooks Stress Tests', () => {
 
       openDrawer();
       fireEvent.click(screen.getByTestId('drawer-new-project-btn'));
+      const submitBtn = screen.getByTestId('create-project-submit');
+      fireEvent.click(submitBtn);
       assertPlaying(false); // Should be stopped
 
       // 3. Check stop on selecting project
