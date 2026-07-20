@@ -26,6 +26,7 @@ export function NewProjectModal({
   });
   const [uploadedNotes, setUploadedNotes] = useState(null);
   const [uploadFileName, setUploadFileName] = useState('');
+  const [jsonText, setJsonText] = useState('');
 
   const notesFileInputRef = useRef(null);
   const backupFileInputRef = useRef(null);
@@ -39,8 +40,10 @@ export function NewProjectModal({
 
     const reader = new FileReader();
     reader.onload = (event) => {
+      const text = event.target.result;
+      setJsonText(text);
       try {
-        const parsed = JSON.parse(event.target.result);
+        const parsed = JSON.parse(text);
         // Supports either { notes: [...] } or direct array [...]
         const notes = Array.isArray(parsed)
           ? parsed
@@ -50,7 +53,12 @@ export function NewProjectModal({
         if (notes) {
           // Remove ID from imported notes as per requirement "notesの情報のidが必要ないなら消してください"
           // (We strip ID if present, useNoteEditor will generate temporary ones on load/add)
-          const cleanNotes = notes.map(({ id, ...rest }) => rest);
+          const cleanNotes = notes.map(({ id, ...rest }) => ({
+            id: crypto.randomUUID
+              ? crypto.randomUUID()
+              : Math.random().toString(36).substring(2, 9),
+            ...rest
+          }));
           setUploadedNotes(cleanNotes);
           // Auto-populate other project metadata if available in JSON
           if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
@@ -78,8 +86,75 @@ export function NewProjectModal({
     reader.readAsText(file);
   };
 
+  const handleJsonTextChange = (e) => {
+    const text = e.target.value;
+    setJsonText(text);
+    if (!text.trim()) {
+      setUploadedNotes(null);
+      setUploadFileName('');
+      return;
+    }
+    try {
+      const parsed = JSON.parse(text);
+      const notes = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed.notes)
+          ? parsed.notes
+          : null;
+      if (notes) {
+        const cleanNotes = notes.map(({ id, ...rest }) => ({
+          id: crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).substring(2, 9),
+          ...rest
+        }));
+        setUploadedNotes(cleanNotes);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          if (parsed.name) setName(parsed.name);
+          if (parsed.composer) setComposer(parsed.composer);
+          if (parsed.bpm) setBpm(Number(parsed.bpm));
+          if (parsed.measureCount)
+            setMeasureCount(Number(parsed.measureCount));
+          if (parsed.tuning) setTuning(parsed.tuning);
+          if (parsed.basePitch) setBasePitch(Number(parsed.basePitch));
+        }
+      }
+    } catch {
+      // Ignore syntax errors while typing
+    }
+  };
+
   const handleCreateSubmit = (e) => {
     e.preventDefault();
+
+    let notesToSubmit = uploadedNotes;
+
+    if (jsonText.trim()) {
+      try {
+        const parsed = JSON.parse(jsonText);
+        const notes = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed.notes)
+            ? parsed.notes
+            : null;
+        if (!notes) {
+          alert(
+            '無効な譜面データフォーマットです。JSON配列を指定してください。'
+          );
+          return;
+        }
+        notesToSubmit = notes.map(({ id, ...rest }) => ({
+          id: crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).substring(2, 9),
+          ...rest
+        }));
+      } catch {
+        alert('JSONの解析に失敗しました。フォーマットを確認してください。');
+        return;
+      }
+    }
+
     onCreateProject({
       name: name.trim() || '無題のプロジェクト',
       composer: composer.trim(),
@@ -88,7 +163,7 @@ export function NewProjectModal({
       bpm,
       measureCount,
       timeSignature,
-      notes: uploadedNotes || []
+      notes: notesToSubmit || []
     });
 
     // Reset state
@@ -96,6 +171,7 @@ export function NewProjectModal({
     setComposer('');
     setUploadedNotes(null);
     setUploadFileName('');
+    setJsonText('');
     onClose();
   };
 
@@ -339,11 +415,19 @@ export function NewProjectModal({
             </div>
 
             {/* JSON notes upload */}
-            <div className="border border-nouaiBlue/10 rounded p-3 bg-white/50">
-              <span className="block font-bold text-xs text-nouaiBlue/80 mb-2">
-                譜面データアップロード (任意)
+            <div className="border border-nouaiBlue/10 rounded p-3 bg-white/50 flex flex-col gap-2">
+              <span className="block font-bold text-xs text-nouaiBlue/80">
+                譜面データ (JSON)
               </span>
-              <div className="flex gap-2 items-center">
+              <textarea
+                data-testid="notes-json-textarea"
+                value={jsonText}
+                onChange={handleJsonTextChange}
+                placeholder="ここに譜面データ (JSON) を入力するか、下のボタンからファイルを読み込んでください"
+                rows={5}
+                className="w-full text-xs p-2 border border-nouaiBlue/25 rounded bg-white text-nouaiBlue focus:outline-none focus:border-shamiRed font-mono resize-y"
+              />
+              <div className="flex gap-2 items-center mt-1">
                 <button
                   type="button"
                   data-testid="upload-notes-btn"
