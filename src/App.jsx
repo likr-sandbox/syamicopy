@@ -13,6 +13,7 @@ import useAudio from './hooks/useAudio';
 import useNoteEditor from './hooks/useNoteEditor';
 import useProjects from './hooks/useProjects';
 import { JA } from './i18n/ja';
+import { getPitchLabel } from './utils/music';
 
 function App() {
   const [activeTab, setActiveTab] = useState('piano-roll');
@@ -187,7 +188,7 @@ function App() {
                 >
                   {Array.from({ length: 37 }, (_, i) => 45 + i).map((p) => (
                     <option key={p} value={p}>
-                      基準音: {p}
+                      基準音: {getPitchLabel(p)}
                     </option>
                   ))}
                 </select>

@@ -2,6 +2,7 @@ import React from 'react';
 import { STEP_WIDTH } from '../../utils/constants';
 import { convertToShamisenNote } from '../../utils/shamisen';
 import { getStepsPerBeat, getStepsPerMeasure } from '../../utils/timeSignature';
+import { getPitchLabel } from '../../utils/music';
 import BunkafuNote from './BunkafuNote';
 
 const BunkafuExport = React.forwardRef(
@@ -50,7 +51,7 @@ const BunkafuExport = React.forwardRef(
                   ? '二上がり'
                   : '三下り'}
             </span>
-            <span>基準音: {basePitch}</span>
+            <span>基準音: {getPitchLabel(basePitch)}</span>
             <span>
               拍子: {timeSignature.numerator}/{timeSignature.denominator}
             </span>

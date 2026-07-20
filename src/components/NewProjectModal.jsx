@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { PRESETS } from '../data/presets';
 import { JA } from '../i18n/ja';
 import { importAllData } from '../utils/storage';
+import { getPitchLabel } from '../utils/music';
 import Modal from './common/Modal';
 import aiPromptText from '../data/aiPrompt.txt?raw';
 
@@ -327,7 +328,7 @@ export function NewProjectModal({
                 >
                   {Array.from({ length: 37 }, (_, i) => 45 + i).map((p) => (
                     <option key={p} value={p}>
-                      {p}
+                      {getPitchLabel(p)}
                     </option>
                   ))}
                 </select>
