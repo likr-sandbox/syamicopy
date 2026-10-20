@@ -72,3 +72,12 @@ For detailed technical documentation, agents must refer to the following files l
      pointer-events: none;
      z-index: -9999;
      ```
+7. **Web Audio Synthesis & Test Tagging**:
+   - When synthesizing instruments with multiple audio nodes (fundamental pitch, bachi attack noise, sawari resonance), tag created nodes with `node._role = 'fundamental' | 'transient' | 'sawari'`.
+   - Test assertions and audio mocks must filter on `node._role === 'fundamental'` to avoid false assertion failures caused by harmonic or resonance oscillators.
+8. **PianoRoll Pitch Coordinates in E2E Tests**:
+   - Vertical grid coordinates follow `y = (MAX_PITCH - pitch) * 20`.
+   - When editing pitch boundaries or clamp logic, always verify that E2E test click coordinates match `MAX_PITCH` (84) defined in `src/utils/constants.js`.
+9. **Subagent Recovery on Server Restart**:
+   - When a system restart signal is received, do not re-spawn duplicate subagents.
+   - Revive existing orchestrators/coordinators using `send_message` with workspace status so that existing artifacts and progress in `.agents/teamwork/` are preserved.
