@@ -105,8 +105,6 @@ describe('Datasets and Localization verification', () => {
     });
   });
 
-
-
   describe('ja.js verification', () => {
     it('exports default, named ja and Named JA, all containing correct localization data', () => {
       expect(DefaultJA).toBeDefined();

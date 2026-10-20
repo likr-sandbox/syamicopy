@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
+import aiPromptText from '../data/aiPrompt.txt?raw';
 import { PRESETS } from '../data/presets';
 import { JA } from '../i18n/ja';
-import { importAllData } from '../utils/storage';
 import { getPitchLabel } from '../utils/music';
+import { importAllData } from '../utils/storage';
 import Modal from './common/Modal';
-import aiPromptText from '../data/aiPrompt.txt?raw';
 
 export function NewProjectModal({
   isOpen,
@@ -25,6 +25,7 @@ export function NewProjectModal({
     numerator: 4,
     denominator: 4
   });
+  const [memo, setMemo] = useState('');
   const [uploadedNotes, setUploadedNotes] = useState(null);
   const [uploadFileName, setUploadFileName] = useState('');
   const [jsonText, setJsonText] = useState('');
@@ -70,6 +71,8 @@ export function NewProjectModal({
               setMeasureCount(Number(parsed.measureCount));
             if (parsed.tuning) setTuning(parsed.tuning);
             if (parsed.basePitch) setBasePitch(Number(parsed.basePitch));
+            if (parsed.timeSignature) setTimeSignature(parsed.timeSignature);
+            if (parsed.memo !== undefined) setMemo(parsed.memo);
           }
         } else {
           alert(
@@ -114,10 +117,11 @@ export function NewProjectModal({
           if (parsed.name) setName(parsed.name);
           if (parsed.composer) setComposer(parsed.composer);
           if (parsed.bpm) setBpm(Number(parsed.bpm));
-          if (parsed.measureCount)
-            setMeasureCount(Number(parsed.measureCount));
+          if (parsed.measureCount) setMeasureCount(Number(parsed.measureCount));
           if (parsed.tuning) setTuning(parsed.tuning);
           if (parsed.basePitch) setBasePitch(Number(parsed.basePitch));
+          if (parsed.timeSignature) setTimeSignature(parsed.timeSignature);
+          if (parsed.memo !== undefined) setMemo(parsed.memo);
         }
       }
     } catch {
@@ -164,12 +168,14 @@ export function NewProjectModal({
       bpm,
       measureCount,
       timeSignature,
+      memo,
       notes: notesToSubmit || []
     });
 
     // Reset state
     setName('');
     setComposer('');
+    setMemo('');
     setUploadedNotes(null);
     setUploadFileName('');
     setJsonText('');
@@ -195,8 +201,6 @@ export function NewProjectModal({
     reader.readAsText(file);
     e.target.value = '';
   };
-
-
 
   const copyPromptToClipboard = () => {
     navigator.clipboard
@@ -346,7 +350,7 @@ export function NewProjectModal({
                 <input
                   id="new-proj-bpm"
                   type="number"
-                  min="40"
+                  min="30"
                   max="240"
                   value={bpm}
                   onChange={(e) => setBpm(Number(e.target.value))}

@@ -115,15 +115,15 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
     ).toHaveValue('49');
   });
 
-  test('should clamp invalid BPM inputs to valid ranges (40 to 240) [Tier 2]', async ({
+  test('should clamp invalid BPM inputs to valid ranges (30 to 240) [Tier 2]', async ({
     page
   }) => {
     await page.click('[data-testid="settings-toggle-btn"]');
 
-    // Under-flow check: input 20 -> expect clamp to 40
+    // Under-flow check: input 20 -> expect clamp to 30
     await page.fill('#settings-bpm', '20');
     await page.locator('#settings-bpm').blur();
-    await expect(page.locator('#settings-bpm')).toHaveValue('40');
+    await expect(page.locator('#settings-bpm')).toHaveValue('30');
 
     // Over-flow check: input 300 -> expect clamp to 240
     await page.fill('#settings-bpm', '300');
@@ -178,7 +178,7 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
 
     // Place note at step 0, pitch 60 (C4)
     const x = 0 * 24 + 12;
-    const y = (93 - 60) * 20 + 30;
+    const y = (84 - 60) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });
@@ -193,8 +193,8 @@ test.describe('Project and Settings Management (Tiers 1 & 2)', () => {
     // The note ID remains the same, but the top offset changes. Let's just check the state, or maybe the visual pos.
     const note = page.locator('[data-testid^="note-block-"]').first();
     const style = await note.getAttribute('style');
-    // Pitch 61 means y = (93 - 61) * 20 = 32 * 20 = 640. Pitch 60 was 33 * 20 = 660.
-    expect(style).toContain('top: 640px');
+    // Pitch 61 means y = (84 - 61) * 20 = 23 * 20 = 460. Pitch 60 was 24 * 20 = 480.
+    expect(style).toContain('top: 460px');
 
     // Bunkafu check skipped
   });

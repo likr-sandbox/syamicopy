@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { PRESETS } from '../data/presets';
 import { JA } from '../i18n/ja';
+import { exportAllData } from '../utils/storage';
 import IconButton from './common/IconButton';
 
 export function Drawer({
@@ -13,6 +14,22 @@ export function Drawer({
   onDeleteProject
 }) {
   if (!isOpen) return null;
+
+  const handleExportBackup = () => {
+    const jsonStr = exportAllData();
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', url);
+    downloadAnchor.setAttribute(
+      'download',
+      `syamicopy_backup_${new Date().toISOString().slice(0, 10)}.json`
+    );
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    URL.revokeObjectURL(url);
+  };
 
   const handleDelete = (e, id, name) => {
     e.stopPropagation();
@@ -126,6 +143,17 @@ export function Drawer({
                 );
               })}
             </div>
+          </div>
+
+          <div className="pt-2 border-t border-nouaiBlue/10 flex flex-col gap-2 flex-shrink-0">
+            <button
+              type="button"
+              data-testid="drawer-backup-btn"
+              onClick={handleExportBackup}
+              className="w-full py-2 border border-nouaiBlue/40 text-nouaiBlue rounded font-semibold hover:bg-nouaiBlue hover:text-washiWhite transition-all text-xs"
+            >
+              全プロジェクト一括バックアップ (JSON)
+            </button>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import html2canvas from 'html2canvas';
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import BunkafuExport from './components/BunkafuView/BunkafuExport';
 import BunkafuView from './components/BunkafuView/BunkafuView';
 import Drawer from './components/Drawer';
@@ -13,6 +13,7 @@ import useAudio from './hooks/useAudio';
 import useNoteEditor from './hooks/useNoteEditor';
 import useProjects from './hooks/useProjects';
 import { JA } from './i18n/ja';
+import { MAX_PITCH, MIN_PITCH } from './utils/constants';
 import { getPitchLabel } from './utils/music';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false);
+  const [sharedScrollLeft, setSharedScrollLeft] = useState(0);
 
   const {
     projects,
@@ -36,6 +38,7 @@ function App() {
     currentStep,
     startPlayback,
     stopPlayback,
+    seekToStep,
     playKeySound,
     getAudioContext
   } = useAudio(
@@ -45,10 +48,17 @@ function App() {
     currentProject?.measureCount
   );
 
-  const { addNote, deleteNote, updateNote } = useNoteEditor(
-    currentProject,
-    updateProject
-  );
+  const {
+    addNote,
+    deleteNote,
+    updateNote,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    lastNoteLength,
+    transposeNotes
+  } = useNoteEditor(currentProject, updateProject);
 
   const bunkafuRef = useRef(null);
   const exportRef = useRef(null);
@@ -111,15 +121,55 @@ function App() {
   };
 
   const handleTranspose = (semitones) => {
-    if (!currentProject?.notes) return;
-    const updatedNotes = currentProject.notes.map((note) => {
-      let newPitch = note.pitch + semitones;
-      // Clamp to A3 (57) ~ A6 (93)
-      newPitch = Math.max(57, Math.min(93, newPitch));
-      return { ...note, pitch: newPitch };
-    });
-    updateProject({ notes: updatedNotes });
+    transposeNotes(semitones);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          activeEl.tagName === 'SELECT' ||
+          activeEl.isContentEditable)
+      ) {
+        return;
+      }
+
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+
+      if (isCmdOrCtrl) {
+        if (!e.shiftKey && (e.key === 'z' || e.key === 'Z')) {
+          e.preventDefault();
+          undo();
+          return;
+        }
+        if (
+          (!e.shiftKey && (e.key === 'y' || e.key === 'Y')) ||
+          (e.shiftKey && (e.key === 'z' || e.key === 'Z'))
+        ) {
+          e.preventDefault();
+          redo();
+          return;
+        }
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (isPlaying) {
+          stopPlayback();
+        } else {
+          startPlayback();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [undo, redo, isPlaying, startPlayback, stopPlayback]);
 
   const tabs = [
     { id: 'piano-roll', label: JA.tabs.pianoRoll },
@@ -132,6 +182,10 @@ function App() {
         projectName={currentProject?.name}
         onOpenDrawer={() => setIsDrawerOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
 
       <TabBar tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
@@ -156,6 +210,10 @@ function App() {
             playKeySound={playKeySound}
             audioContext={getAudioContext()}
             bunkafuRef={bunkafuRef}
+            seekToStep={seekToStep}
+            lastNoteLength={lastNoteLength}
+            sharedScrollLeft={sharedScrollLeft}
+            onScrollChange={setSharedScrollLeft}
           />
         )}
 
@@ -207,6 +265,9 @@ function App() {
                 }
               }
               measureCount={currentProject?.measureCount || 8}
+              seekToStep={seekToStep}
+              sharedScrollLeft={sharedScrollLeft}
+              onScrollChange={setSharedScrollLeft}
             />
             {/* Save Image Button below preview */}
             <div className="flex justify-center mt-2 pb-4">
@@ -272,6 +333,9 @@ function App() {
       >
         <BunkafuExport
           ref={exportRef}
+          name={currentProject?.name}
+          composer={currentProject?.composer}
+          bpm={currentProject?.bpm}
           notes={currentProject?.notes || []}
           tuning={currentProject?.tuning || 'honchoshi'}
           basePitch={currentProject?.basePitch || 48}

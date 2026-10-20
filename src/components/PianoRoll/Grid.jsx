@@ -24,7 +24,9 @@ export const Grid = ({
   tuning,
   basePitch,
   playKeySound,
-  currentStep
+  currentStep,
+  seekToStep,
+  lastNoteLength = 4
 }) => {
   const totalSteps = getTotalSteps(timeSignature, measureCount);
   const stepsPerBeat = getStepsPerBeat(timeSignature);
@@ -64,7 +66,11 @@ export const Grid = ({
     const clampedStep = Math.max(0, Math.min(totalSteps - 1, step));
     const clampedPitch = Math.max(MIN_PITCH, Math.min(MAX_PITCH, pitch));
 
-    addNote({ pitch: clampedPitch, step: clampedStep, length: 4 });
+    addNote({
+      pitch: clampedPitch,
+      step: clampedStep,
+      length: lastNoteLength || 4
+    });
     playKeySound(clampedPitch);
   };
 
@@ -111,13 +117,25 @@ export const Grid = ({
       >
         {/* Measure Header Bar */}
         <div
-          className="h-[20px] bg-neutral-50 border-b border-nouaiBlue/20 relative"
+          className="h-[20px] bg-neutral-50 border-b border-nouaiBlue/20 relative cursor-pointer"
           style={{ width: `${gridWidth}px` }}
+          data-testid="measure-header-bar"
+          onClick={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const step = Math.floor(clickX / STEP_WIDTH);
+            const clampedStep = Math.max(0, Math.min(totalSteps - 1, step));
+            if (seekToStep) {
+              seekToStep(clampedStep);
+            }
+          }}
+          onKeyDown={() => {}}
+          role="presentation"
         >
           {measures.map((measure) => (
             <div
               key={measure.index}
-              className="absolute text-[9px] font-sans text-nouaiBlue/60 font-bold px-1 py-[2px]"
+              className="absolute text-[9px] font-sans text-nouaiBlue/60 font-bold px-1 py-[2px] pointer-events-none"
               style={{ left: `${measure.left}px` }}
             >
               M{measure.index + 1}
@@ -136,12 +154,12 @@ export const Grid = ({
           onKeyDown={() => {}}
           role="presentation"
         >
-          {/* Background Rows with DOM Cells */}
+          {/* Background Rows */}
           {pitches.map((pitch) => {
             const isBlack = isBlackKey(pitch);
             const isOpen = openPitches.includes(pitch);
 
-            let rowClass = 'flex h-[20px] w-full';
+            let rowClass = 'h-[20px] w-full border-b border-nouaiBlue/10';
             if (isOpen) {
               rowClass += ' bg-shamiRed/5';
             } else if (isBlack) {
@@ -150,45 +168,12 @@ export const Grid = ({
               rowClass += ' bg-white';
             }
 
-            const cells = [];
-            for (let step = 0; step < totalSteps; step++) {
-              let cellClass =
-                'w-[24px] h-full flex-shrink-0 cursor-crosshair border-b border-nouaiBlue/10 border-r border-nouaiBlue/10';
-              if ((step + 1) % stepsPerMeasure === 0) {
-                cellClass =
-                  'w-[24px] h-full flex-shrink-0 cursor-crosshair border-b border-nouaiBlue/10 border-r-2 border-r-nouaiBlue/40';
-              } else if ((step + 1) % stepsPerBeat === 0) {
-                cellClass =
-                  'w-[24px] h-full flex-shrink-0 cursor-crosshair border-b border-nouaiBlue/10 border-r border-r-nouaiBlue/25';
-              }
-
-              cells.push(
-                <div
-                  key={step}
-                  className={cellClass}
-                  data-testid={`grid-cell-${step}-${pitch}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (Date.now() - lastDeleteTimeRef.current < 300) {
-                      return;
-                    }
-                    addNote({ pitch, step, length: 4 });
-                    playKeySound(pitch);
-                  }}
-                  onKeyDown={() => {}}
-                  role="presentation"
-                />
-              );
-            }
-
             return (
               <div
                 key={pitch}
                 className={rowClass}
                 style={{ height: `${ROW_HEIGHT}px` }}
-              >
-                {cells}
-              </div>
+              />
             );
           })}
 

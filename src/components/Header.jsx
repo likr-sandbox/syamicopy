@@ -1,13 +1,21 @@
 import React from 'react';
 import IconButton from './common/IconButton';
 
-export function Header({ projectName, onOpenDrawer, onOpenSettings }) {
+export function Header({
+  projectName,
+  onOpenDrawer,
+  onOpenSettings,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false
+}) {
   return (
     <header
       data-testid="header-container"
       className="px-4 py-3 bg-washiWhite border-b border-nouaiBlue/20 flex justify-between items-center z-10 shadow-sm"
     >
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         <h1 data-testid="header-logo" className="sr-only">
           シャミコピー
         </h1>
@@ -31,6 +39,54 @@ export function Header({ projectName, onOpenDrawer, onOpenSettings }) {
               strokeLinejoin="round"
               strokeWidth={2}
               d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </IconButton>
+        <IconButton
+          data-testid="undo-btn"
+          onClick={onUndo}
+          disabled={!canUndo}
+          ariaLabel="元に戻す"
+          variant="ghost"
+          className="text-nouaiBlue hover:bg-nouaiBlue/5 disabled:opacity-40"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>元に戻す</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 10h10a5 5 0 015 5v2M3 10l6-6M3 10l6 6"
+            />
+          </svg>
+        </IconButton>
+        <IconButton
+          data-testid="redo-btn"
+          onClick={onRedo}
+          disabled={!canRedo}
+          ariaLabel="やり直す"
+          variant="ghost"
+          className="text-nouaiBlue hover:bg-nouaiBlue/5 disabled:opacity-40"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <title>やり直す</title>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 10h-10a5 5 0 00-5 5v2M21 10l-6-6M21 10l-6 6"
             />
           </svg>
         </IconButton>

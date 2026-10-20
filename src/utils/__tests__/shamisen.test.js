@@ -78,8 +78,69 @@ describe('shamisen utility helpers', () => {
       // Pitch below lowest string open pitch (48)
       expect(convertToShamisenNote(40, 'honchoshi', 48)).toBeNull();
 
-      // Pitch above maximum offset from highest string (60 + 15 = 75)
-      expect(convertToShamisenNote(76, 'honchoshi', 48)).toBeNull();
+      // Pitch 76 is now valid tsubo '14' on string 2 (60 + 16 = 76)
+      expect(convertToShamisenNote(76, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '14'
+      });
+
+      // Pitch above maximum offset from highest string (60 + 21 = 81 is tsubo '19')
+      expect(convertToShamisenNote(82, 'honchoshi', 48)).toBeNull();
+      expect(convertToShamisenNote(85, 'honchoshi', 48)).toBeNull();
+    });
+
+    it('maps high tsubo positions 14 through 19 accurately', () => {
+      // String 2 open pitch 60
+      expect(convertToShamisenNote(76, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '14'
+      });
+      expect(convertToShamisenNote(77, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '15'
+      });
+      expect(convertToShamisenNote(78, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '16'
+      });
+      expect(convertToShamisenNote(79, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '17'
+      });
+      expect(convertToShamisenNote(80, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '18'
+      });
+      expect(convertToShamisenNote(81, 'honchoshi', 48)).toEqual({
+        stringIndex: 2,
+        tsubo: '19'
+      });
+    });
+
+    it('respects preferredString when pitch is playable across multiple strings', () => {
+      // Target pitch 60 (C4) under honchoshi 48 (open: [48, 53, 60])
+      // String 0: 60 - 48 = 12 -> tsubo '10'
+      // String 1: 60 - 53 = 7 -> tsubo '6'
+      // String 2: 60 - 60 = 0 -> tsubo '0'
+      expect(convertToShamisenNote(60, 'honchoshi', 48, 0)).toEqual({
+        stringIndex: 0,
+        tsubo: '10'
+      });
+      expect(convertToShamisenNote(60, 'honchoshi', 48, 1)).toEqual({
+        stringIndex: 1,
+        tsubo: '6'
+      });
+      expect(convertToShamisenNote(60, 'honchoshi', 48, 2)).toEqual({
+        stringIndex: 2,
+        tsubo: '0'
+      });
+
+      // Falls back to highest playable string when preferredString is unplayable
+      // Pitch 48 is unplayable on String 2 (open 60) and String 1 (open 53) -> falls back to String 0
+      expect(convertToShamisenNote(48, 'honchoshi', 48, 2)).toEqual({
+        stringIndex: 0,
+        tsubo: '0'
+      });
     });
 
     it('forces basePitch to be a number and avoids string coercion bugs', () => {

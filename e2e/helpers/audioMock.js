@@ -61,6 +61,24 @@ export async function setupAudioSpy(page) {
                   time: time,
                   timestamp: Date.now()
                 });
+              },
+              exponentialRampToValueAtTime: (val, time) => {
+                _val = val;
+                window.__audioAudit.push({
+                  type: 'oscillator-frequency',
+                  value: val,
+                  time: time,
+                  timestamp: Date.now()
+                });
+              },
+              linearRampToValueAtTime: (val, time) => {
+                _val = val;
+                window.__audioAudit.push({
+                  type: 'oscillator-frequency',
+                  value: val,
+                  time: time,
+                  timestamp: Date.now()
+                });
               }
             };
           })(),
@@ -74,6 +92,7 @@ export async function setupAudioSpy(page) {
             this.started = time || 0;
             window.__audioAudit.push({
               type: 'oscillator-start',
+              role: this.role || 'fundamental',
               waveform: this.type,
               frequency: this.frequency.value,
               time: time,
@@ -164,10 +183,62 @@ export async function setupAudioSpy(page) {
 
       createBiquadFilter() {
         return {
-          frequency: { value: 350, setValueAtTime: () => {} },
-          Q: { value: 1 },
-          connect: () => {},
-          disconnect: () => {}
+          type: 'lowpass',
+          frequency: {
+            value: 350,
+            setValueAtTime: (val) => {
+              this.value = val;
+            },
+            exponentialRampToValueAtTime: (val) => {
+              this.value = val;
+            },
+            linearRampToValueAtTime: (val) => {
+              this.value = val;
+            }
+          },
+          Q: {
+            value: 1,
+            setValueAtTime: (val) => {
+              this.value = val;
+            }
+          },
+          connect: function (destination) {
+            this.connectedTo = destination;
+          },
+          disconnect: function () {
+            this.connectedTo = null;
+          }
+        };
+      }
+
+      createBuffer(channels, length, sampleRate) {
+        return {
+          numberOfChannels: channels,
+          length: length,
+          sampleRate: sampleRate,
+          duration: length / sampleRate,
+          getChannelData: () => new Float32Array(length),
+          copyFromChannel: () => {},
+          copyToChannel: () => {}
+        };
+      }
+
+      createBufferSource() {
+        return {
+          buffer: null,
+          loop: false,
+          connect: function (destination) {
+            this.connectedTo = destination;
+          },
+          disconnect: function () {
+            this.connectedTo = null;
+          },
+          start: function (time) {
+            this.started = time || 0;
+          },
+          stop: function (time) {
+            this.stopped = time || 0;
+          }
         };
       }
 

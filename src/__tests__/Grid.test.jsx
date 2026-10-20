@@ -78,4 +78,12 @@ describe('Grid component', () => {
     // 5 * 24 = 120px
     expect(head.style.left).toBe('120px');
   });
+
+  it('eliminates individual cell divs to achieve DOM reduction', () => {
+    const { container } = render(<Grid {...defaultProps} />);
+    const cellElements = container.querySelectorAll(
+      '[data-testid^="grid-cell-"]'
+    );
+    expect(cellElements.length).toBe(0);
+  });
 });

@@ -97,14 +97,26 @@ describe('Adversarial and Correctness Stress Tests', () => {
     describe('convertToShamisenNote', () => {
       it('verifies boundary conditions at limits', () => {
         // Base pitch 48. Open pitches are [48, 53, 60] (honchoshi)
-        // Max pitch offset on string 2 is 60 + 15 = 75. TSUBO_MAP[15] is '13'
+        // Pitch 75 on string 2 is 60 + 15 = 75. TSUBO_MAP[15] is '13'
         expect(convertToShamisenNote(75, 'honchoshi', 48)).toEqual({
           stringIndex: 2,
           tsubo: '13'
         });
 
-        // Pitch 76 is out of range (> 15 diff)
-        expect(convertToShamisenNote(76, 'honchoshi', 48)).toBeNull();
+        // Pitch 76 is now valid tsubo '14' on string 2
+        expect(convertToShamisenNote(76, 'honchoshi', 48)).toEqual({
+          stringIndex: 2,
+          tsubo: '14'
+        });
+
+        // Max pitch offset on string 2 is 60 + 21 = 81. TSUBO_MAP[21] is '19'
+        expect(convertToShamisenNote(81, 'honchoshi', 48)).toEqual({
+          stringIndex: 2,
+          tsubo: '19'
+        });
+
+        // Pitch 82+ (e.g. 85) is out of range (> 21 diff)
+        expect(convertToShamisenNote(85, 'honchoshi', 48)).toBeNull();
       });
 
       it('handles negative or invalid inputs', () => {

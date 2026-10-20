@@ -21,10 +21,22 @@ test.describe('Bunkafu Score View and Image Export (Tiers 1 & 2)', () => {
     await page.click('[data-testid="tab-piano-roll"]');
 
     // Input sample pitches in Editor
-    await page.click('[data-testid="grid-cell-0-60"]'); // C4 (String 0, Open)
-    await page.click('[data-testid="grid-cell-4-65"]'); // F4 (String 1, Open)
-    await page.click('[data-testid="grid-cell-8-66"]'); // F#4 (String 1, Tsubo 1)
-    await page.click('[data-testid="grid-cell-12-72"]'); // C5 (String 2, Open)
+    await page.locator('[data-testid="grid"]').click({
+      position: { x: 0 * 24 + 12, y: (84 - 60) * 20 + 30 },
+      force: true
+    }); // C4 (String 0, Open)
+    await page.locator('[data-testid="grid"]').click({
+      position: { x: 4 * 24 + 12, y: (84 - 65) * 20 + 30 },
+      force: true
+    }); // F4 (String 1, Open)
+    await page.locator('[data-testid="grid"]').click({
+      position: { x: 8 * 24 + 12, y: (84 - 66) * 20 + 30 },
+      force: true
+    }); // F#4 (String 1, Tsubo 1)
+    await page.locator('[data-testid="grid"]').click({
+      position: { x: 12 * 24 + 12, y: (84 - 72) * 20 + 30 },
+      force: true
+    }); // C5 (String 2, Open)
 
     // Switch to Bunkafu Tab
     await page.click('[data-testid="tab-bunkafu"]');
@@ -154,8 +166,14 @@ test.describe('Bunkafu Score View and Image Export (Tiers 1 & 2)', () => {
     await page.click('[data-testid="tab-piano-roll"]');
 
     // Place note 65 at step 0, and note 67 at step 4
-    await page.click('[data-testid="grid-cell-0-65"]');
-    await page.click('[data-testid="grid-cell-4-67"]');
+    await page.locator('[data-testid="grid"]').click({
+      position: { x: 0 * 24 + 12, y: (84 - 65) * 20 + 30 },
+      force: true
+    });
+    await page.locator('[data-testid="grid"]').click({
+      position: { x: 4 * 24 + 12, y: (84 - 67) * 20 + 30 },
+      force: true
+    });
 
     // Toggle to Bunkafu view
     await page.click('[data-testid="tab-bunkafu"]');

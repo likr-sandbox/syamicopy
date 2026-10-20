@@ -1,5 +1,6 @@
 import React from 'react';
 import { JA } from '../i18n/ja';
+import { getStepsPerMeasure } from '../utils/timeSignature';
 import Modal from './common/Modal';
 
 export function SettingsModal({
@@ -20,8 +21,30 @@ export function SettingsModal({
       onUpdateProject({ bpm: 100 });
       return;
     }
-    const clamped = Math.max(40, Math.min(240, val));
+    const clamped = Math.max(30, Math.min(240, val));
     onUpdateProject({ bpm: clamped });
+  };
+
+  const handleMeasureCountChange = (newCount) => {
+    const val = Number(newCount);
+    if (Number.isNaN(val) || val <= 0) {
+      onUpdateProject({ measureCount: val });
+      return;
+    }
+    const stepsPerMeasure = getStepsPerMeasure(
+      currentProject.timeSignature || { numerator: 4, denominator: 4 }
+    );
+    const newTotalSteps = stepsPerMeasure * val;
+    let updatedNotes = currentProject.notes || [];
+    if (updatedNotes.length > 0) {
+      updatedNotes = updatedNotes
+        .filter((note) => note.step < newTotalSteps)
+        .map((note) => ({
+          ...note,
+          length: Math.min(note.length, newTotalSteps - note.step)
+        }));
+    }
+    onUpdateProject({ measureCount: val, notes: updatedNotes });
   };
 
   const handleTimeSignatureChange = (field, value) => {
@@ -55,25 +78,17 @@ export function SettingsModal({
       <div className="space-y-4 text-sm" data-testid="settings-form">
         <div className="flex flex-col gap-1">
           <label
-            htmlFor="settings-project-name"
+            htmlFor="settings-name"
             className="font-bold text-nouaiBlue/85"
           >
             {JA.settings.projectName}
           </label>
           <input
-            id="settings-project-name"
-            type="text"
-            value={currentProject.name || ''}
-            onChange={(e) => handleInputChange('name', e.target.value)}
-            className="px-3 py-2 border border-nouaiBlue/25 rounded bg-white focus:outline-none focus:border-shamiRed text-nouaiBlue"
-          />
-          <input
             id="settings-name"
             type="text"
             value={currentProject.name || ''}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className="absolute opacity-0 pointer-events-none w-px h-px"
-            tabIndex={-1}
+            className="px-3 py-2 border border-nouaiBlue/25 rounded bg-white focus:outline-none focus:border-shamiRed text-nouaiBlue"
           />
         </div>
 
@@ -126,20 +141,8 @@ export function SettingsModal({
               min="1"
               max="100"
               value={currentProject.measureCount || 8}
-              onChange={(e) =>
-                handleInputChange('measureCount', Number(e.target.value))
-              }
+              onChange={(e) => handleMeasureCountChange(Number(e.target.value))}
               className="px-3 py-2 border border-nouaiBlue/25 rounded bg-white focus:outline-none focus:border-shamiRed text-nouaiBlue"
-            />
-            <input
-              id="settings-measure-count"
-              type="number"
-              value={currentProject.measureCount || 8}
-              onChange={(e) =>
-                handleInputChange('measureCount', Number(e.target.value))
-              }
-              className="absolute opacity-0 pointer-events-none w-px h-px"
-              tabIndex={-1}
             />
           </div>
         </div>

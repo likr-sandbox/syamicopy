@@ -16,7 +16,10 @@ const BunkafuView = React.forwardRef(
       basePitch = 48,
       currentStep = -1,
       timeSignature = { numerator: 4, denominator: 4 },
-      measureCount = 8
+      measureCount = 8,
+      seekToStep,
+      sharedScrollLeft,
+      onScrollChange
     },
     ref
   ) => {
@@ -30,6 +33,18 @@ const BunkafuView = React.forwardRef(
       1: 40, // 二の糸 (中)
       0: 64 // 一の糸 (下)
     };
+
+    // タブ切替時のスクロール復元
+    useEffect(() => {
+      const container = ref?.current;
+      if (
+        container &&
+        typeof sharedScrollLeft === 'number' &&
+        sharedScrollLeft > 0
+      ) {
+        container.scrollLeft = sharedScrollLeft;
+      }
+    }, [sharedScrollLeft, ref]);
 
     // 再生中の自動スクロール
     useEffect(() => {
@@ -45,11 +60,15 @@ const BunkafuView = React.forwardRef(
       const isEvery8Steps = currentStep % 8 === 0;
 
       if (isOutOfViewport || isEvery8Steps) {
-        const targetScroll = playheadX - clientWidth / 2;
-        container.scrollTo({
-          left: Math.max(0, targetScroll),
-          behavior: 'smooth'
-        });
+        const targetScroll = Math.max(0, playheadX - clientWidth / 2);
+        if (typeof container.scrollTo === 'function') {
+          container.scrollTo({
+            left: targetScroll,
+            behavior: 'smooth'
+          });
+        } else {
+          container.scrollLeft = targetScroll;
+        }
       }
     }, [currentStep, ref]);
 
@@ -76,7 +95,12 @@ const BunkafuView = React.forwardRef(
     const renderItems = [];
 
     for (const note of notes) {
-      const shamiNote = convertToShamisenNote(note.pitch, tuning, basePitch);
+      const shamiNote = convertToShamisenNote(
+        note.pitch,
+        tuning,
+        basePitch,
+        note.preferredString
+      );
       if (shamiNote) {
         const isCurrent =
           currentStep >= note.step && currentStep < note.step + note.length;
@@ -96,9 +120,9 @@ const BunkafuView = React.forwardRef(
           />
         );
 
-        // 伸ばし棒の計算: 1拍（4ステップ）より長い場合に4ステップごとに追加
-        if (note.length > 4) {
-          for (let i = 4; i < note.length; i += 4) {
+        // 伸ばし棒の計算: 1拍（stepsPerBeatステップ）より長い場合にstepsPerBeatステップごとに追加
+        if (note.length > stepsPerBeat) {
+          for (let i = stepsPerBeat; i < note.length; i += stepsPerBeat) {
             const extendStep = note.step + i;
             if (extendStep >= totalSteps) break;
 
@@ -106,9 +130,10 @@ const BunkafuView = React.forwardRef(
               <BunkafuNote
                 key={`extend-${note.id}-${extendStep}`}
                 tsubo="ー"
-                length={4} // 伸ばし棒は四分音符扱い（下線なし）
+                length={stepsPerBeat}
                 isCurrent={
-                  currentStep >= extendStep && currentStep < extendStep + 4
+                  currentStep >= extendStep &&
+                  currentStep < extendStep + stepsPerBeat
                 }
                 x={extendStep * STEP_WIDTH + STEP_WIDTH / 2}
                 y={Y_COORDINATES[shamiNote.stringIndex]}
@@ -174,12 +199,29 @@ const BunkafuView = React.forwardRef(
           {/* 譜面スクロール領域 */}
           <div
             ref={ref}
-            data-testid="bunkafu-scroll-container"
-            className="flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-nouaiBlue/20 scrollbar-track-transparent"
+            data-testid="bunkafu-view-scroll"
+            className="bunkafu-scroll-container flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-nouaiBlue/20 scrollbar-track-transparent"
+            onScroll={(e) => {
+              if (onScrollChange) {
+                onScrollChange(e.target.scrollLeft);
+              }
+            }}
           >
             <div
-              className="relative h-20"
+              data-testid="bunkafu-scroll-container"
+              className="relative h-20 cursor-pointer"
               style={{ width: `${totalSteps * STEP_WIDTH}px` }}
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const step = Math.floor(clickX / STEP_WIDTH);
+                const clampedStep = Math.max(0, Math.min(totalSteps - 1, step));
+                if (seekToStep) {
+                  seekToStep(clampedStep);
+                }
+              }}
+              onKeyDown={() => {}}
+              role="presentation"
             >
               {/* 3本の糸（水平線） */}
               <div

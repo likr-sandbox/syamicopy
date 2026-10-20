@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useAutoScroll from '../../hooks/useAutoScroll';
 import Grid from './Grid';
 import Keyboard from './Keyboard';
@@ -17,9 +17,23 @@ export const PianoRoll = ({
   timeSignature,
   playKeySound,
   audioContext,
-  bunkafuRef
+  bunkafuRef,
+  seekToStep,
+  lastNoteLength,
+  sharedScrollLeft,
+  onScrollChange
 }) => {
   const gridContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (
+      gridContainerRef.current &&
+      typeof sharedScrollLeft === 'number' &&
+      sharedScrollLeft > 0
+    ) {
+      gridContainerRef.current.scrollLeft = sharedScrollLeft;
+    }
+  }, [sharedScrollLeft]);
 
   const { handleGridScroll } = useAutoScroll(
     gridContainerRef,
@@ -58,7 +72,12 @@ export const PianoRoll = ({
       <div
         ref={gridContainerRef}
         className="w-full flex-1 overflow-auto relative flex border border-nouaiBlue/20 rounded bg-white"
-        onScroll={handleGridScroll}
+        onScroll={(e) => {
+          handleGridScroll(e);
+          if (onScrollChange) {
+            onScrollChange(e.target.scrollLeft);
+          }
+        }}
         data-testid="piano-roll"
       >
         {/* Sticky Keyboard */}
@@ -88,6 +107,8 @@ export const PianoRoll = ({
           basePitch={basePitch}
           playKeySound={playKeySound}
           currentStep={currentStep}
+          seekToStep={seekToStep}
+          lastNoteLength={lastNoteLength}
         />
       </div>
     </div>

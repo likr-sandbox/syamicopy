@@ -11,10 +11,12 @@ function BunkafuNote({
   stringIndex
 }) {
   // 1拍のステップ数は通常 4 (4/4拍子において)
-  // length === 2 (八分音符) -> 下線1本
+  // length === 2 (八分音符) または length === 3 (付点八分音符) -> 下線1本
   // length === 1 (十六分音符) -> 下線2本
-  const isEighth = length === 2;
+  // length === 3 (付点八分音符) または length === 6 (付点四分音符) -> 付点
+  const isEighth = length === 2 || length === 3;
   const isSixteenth = length === 1;
+  const isDotted = length === 3 || length === 6;
 
   return (
     <div
@@ -31,6 +33,8 @@ function BunkafuNote({
       data-string-index={stringIndex !== undefined ? stringIndex : undefined}
     >
       <svg
+        role="img"
+        aria-label={tsubo}
         width="20"
         height="16"
         viewBox="0 0 20 16"
@@ -48,6 +52,7 @@ function BunkafuNote({
         >
           {tsubo}
         </text>
+        {isDotted && <circle cx="17" cy="12" r="1.5" fill="currentColor" />}
       </svg>
       {isEighth && (
         <div

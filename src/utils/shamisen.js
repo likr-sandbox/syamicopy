@@ -1,4 +1,4 @@
-const TSUBO_MAP = [
+export const TSUBO_MAP = [
   '0',
   '1',
   '2',
@@ -14,7 +14,13 @@ const TSUBO_MAP = [
   '10',
   '11',
   '12',
-  '13'
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19'
 ];
 
 export const getStringOpenPitches = (tuningKey, basePitch) => {
@@ -34,7 +40,12 @@ export const getStringOpenPitches = (tuningKey, basePitch) => {
   }
 };
 
-export const convertToShamisenNote = (pitch, tuningKey, basePitch) => {
+export const convertToShamisenNote = (
+  pitch,
+  tuningKey,
+  basePitch,
+  preferredString
+) => {
   const base = Number(basePitch);
   if (
     Number.isNaN(base) ||
@@ -50,9 +61,22 @@ export const convertToShamisenNote = (pitch, tuningKey, basePitch) => {
     return null;
   }
 
+  if (preferredString !== undefined && preferredString !== null) {
+    const pStr = Number(preferredString);
+    if ([0, 1, 2].includes(pStr)) {
+      const diff = Number(pitch) - strings[pStr];
+      if (diff >= 0 && diff < TSUBO_MAP.length) {
+        const tsubo = TSUBO_MAP[diff];
+        if (tsubo !== undefined) {
+          return { stringIndex: pStr, tsubo };
+        }
+      }
+    }
+  }
+
   for (let i = 2; i >= 0; i--) {
     const diff = Number(pitch) - strings[i];
-    if (diff >= 0 && diff <= 15) {
+    if (diff >= 0 && diff < TSUBO_MAP.length) {
       const tsubo = TSUBO_MAP[diff];
       if (tsubo !== undefined) {
         return { stringIndex: i, tsubo };

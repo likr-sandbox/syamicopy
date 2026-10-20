@@ -44,7 +44,7 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
 
     // Add note on step 0, MIDI pitch 72 (C5)
     const x = 0 * 24 + 12;
-    const y = (93 - 72) * 20 + 30;
+    const y = (84 - 72) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });
@@ -81,7 +81,7 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
 
     // Place a note at step 60, pitch 72
     const x = 60 * 24 + 12;
-    const y = (93 - 72) * 20 + 30;
+    const y = (84 - 72) * 20 + 30;
     await page
       .locator('[data-testid="grid"]')
       .click({ position: { x, y }, force: true });
@@ -103,7 +103,7 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
     await page.click('[data-testid="play-toggle-btn"]'); // Stop
   });
 
-  test.skip('should synchronize scroll offsets between editor and Bunkafu views [Tier 3]', async ({
+  test('should synchronize scroll offsets between editor and Bunkafu views [Tier 3]', async ({
     page
   }) => {
     const pianoGrid = page.locator('.flex-1.overflow-auto').first();
@@ -121,8 +121,8 @@ test.describe('Playback Controls and Scheduler (Tiers 1 & 2)', () => {
       .locator('[data-testid="bunkafu-view-scroll"], .bunkafu-scroll-container')
       .first();
     await expect(async () => {
-      const _offset = await bunkafuScroll.evaluate((el) => el?.scrollLeft || 0);
-      // Wait, bunkafu view doesn't exist yet, we should maybe skip this test.
+      const offset = await bunkafuScroll.evaluate((el) => el?.scrollLeft || 0);
+      expect(offset).toBe(150);
     }).toPass();
   });
 

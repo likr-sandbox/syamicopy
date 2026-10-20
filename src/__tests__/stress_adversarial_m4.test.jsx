@@ -12,6 +12,7 @@ import SettingsModal from '../components/SettingsModal';
 import { useAudio } from '../hooks/useAudio';
 import { JA } from '../i18n/ja';
 import * as audioUtils from '../utils/audio';
+import { MAX_PITCH, MIN_PITCH } from '../utils/constants';
 
 vi.mock('../utils/audio', async (importOriginal) => {
   const actual = await importOriginal();
@@ -216,46 +217,46 @@ describe('Milestone 4 Stress and Adversarial Input Tests', () => {
   });
 
   describe('Pitch Transpositions Clamping', () => {
-    it('clamps transposed pitches strictly at 57 and 93', () => {
+    it('clamps transposed pitches strictly at MIN_PITCH (36) and MAX_PITCH (84)', () => {
       const transpose = (notes, semitones) => {
         return notes.map((note) => {
           let newPitch = note.pitch + semitones;
-          newPitch = Math.max(57, Math.min(93, newPitch));
+          newPitch = Math.max(MIN_PITCH, Math.min(MAX_PITCH, newPitch));
           return { ...note, pitch: newPitch };
         });
       };
 
       const notes = [
-        { id: 'note1', pitch: 58, step: 0, length: 4 },
-        { id: 'note2', pitch: 92, step: 4, length: 4 }
+        { id: 'note1', pitch: 37, step: 0, length: 4 },
+        { id: 'note2', pitch: 83, step: 4, length: 4 }
       ];
 
-      // 1. Transpose DOWN by -1. note1 (58 -> 57), note2 (92 -> 91)
+      // 1. Transpose DOWN by -1. note1 (37 -> 36), note2 (83 -> 82)
       const down = transpose(notes, -1);
       expect(down).toEqual([
-        { id: 'note1', pitch: 57, step: 0, length: 4 },
-        { id: 'note2', pitch: 91, step: 4, length: 4 }
+        { id: 'note1', pitch: 36, step: 0, length: 4 },
+        { id: 'note2', pitch: 82, step: 4, length: 4 }
       ]);
 
-      // Transpose DOWN again by -1. note1 should clamp at 57!
+      // Transpose DOWN again by -1. note1 should clamp at 36!
       const downClamped = transpose(down, -1);
       expect(downClamped).toEqual([
-        { id: 'note1', pitch: 57, step: 0, length: 4 },
-        { id: 'note2', pitch: 90, step: 4, length: 4 }
+        { id: 'note1', pitch: 36, step: 0, length: 4 },
+        { id: 'note2', pitch: 81, step: 4, length: 4 }
       ]);
 
       // 2. Transpose UP by +1.
       const up = transpose(notes, 1);
       expect(up).toEqual([
-        { id: 'note1', pitch: 59, step: 0, length: 4 },
-        { id: 'note2', pitch: 93, step: 4, length: 4 }
+        { id: 'note1', pitch: 38, step: 0, length: 4 },
+        { id: 'note2', pitch: 84, step: 4, length: 4 }
       ]);
 
-      // Transpose UP again. note2 should clamp at 93.
+      // Transpose UP again. note2 should clamp at 84.
       const upClamped = transpose(up, 1);
       expect(upClamped).toEqual([
-        { id: 'note1', pitch: 60, step: 0, length: 4 },
-        { id: 'note2', pitch: 93, step: 4, length: 4 }
+        { id: 'note1', pitch: 39, step: 0, length: 4 },
+        { id: 'note2', pitch: 84, step: 4, length: 4 }
       ]);
     });
   });

@@ -170,6 +170,71 @@ describe('audio synthesis helpers', () => {
       };
       expect(playShamisenSound(closedContext, 60, 1.0)).toBeNull();
     });
+
+    it('schedules playback at specified startTime parameter when provided', () => {
+      const scheduledTime = 45.67;
+      playShamisenSound(mockAudioContext, 60, 1.0, scheduledTime);
+
+      expect(mockOscillator.start).toHaveBeenCalledWith(scheduledTime);
+      expect(mockOscillator.stop).toHaveBeenCalledWith(scheduledTime + 1.0);
+      expect(mockGainNode.gain.setValueAtTime).toHaveBeenCalledWith(
+        0,
+        scheduledTime
+      );
+    });
+
+    it('configures acoustic filter sweep, attack transient, and sawari when createBiquadFilter is available', () => {
+      const mockFilter = {
+        type: '',
+        frequency: {
+          value: 0,
+          setValueAtTime: vi.fn(),
+          exponentialRampToValueAtTime: vi.fn()
+        },
+        Q: {
+          value: 1,
+          setValueAtTime: vi.fn()
+        },
+        connect: vi.fn()
+      };
+
+      const advancedContext = {
+        currentTime: 10.0,
+        destination: {},
+        createOscillator: vi.fn(() => ({
+          type: '',
+          frequency: {
+            value: 0,
+            setValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn()
+          },
+          connect: vi.fn(),
+          start: vi.fn(),
+          stop: vi.fn()
+        })),
+        createGain: vi.fn(() => ({
+          gain: {
+            value: 1,
+            setValueAtTime: vi.fn(),
+            linearRampToValueAtTime: vi.fn(),
+            exponentialRampToValueAtTime: vi.fn()
+          },
+          connect: vi.fn()
+        })),
+        createBiquadFilter: vi.fn(() => mockFilter)
+      };
+
+      const result = playShamisenSound(advancedContext, 60, 1.2, 10.0);
+
+      expect(advancedContext.createBiquadFilter).toHaveBeenCalled();
+      expect(mockFilter.type).toBe('lowpass');
+      expect(mockFilter.frequency.setValueAtTime).toHaveBeenCalled();
+      expect(mockFilter.connect).toHaveBeenCalledWith(
+        advancedContext.destination
+      );
+      expect(result).toHaveProperty('oscillator');
+      expect(result).toHaveProperty('gainNode');
+    });
   });
 
   describe('startSustainedNote', () => {

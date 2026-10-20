@@ -46,19 +46,19 @@ test.describe('Real-World Composition Scenario (Tier 4)', () => {
       .locator('[data-testid="piano-roll"]')
       .evaluate((el) => el.scrollTo(0, 300));
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 0 * 24 + 12, y: (93 - 57) * 20 + 30 },
+      position: { x: 0 * 24 + 12, y: (84 - 57) * 20 + 30 },
       force: true
     }); // A3
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 4 * 24 + 12, y: (93 - 57) * 20 + 30 },
+      position: { x: 4 * 24 + 12, y: (84 - 57) * 20 + 30 },
       force: true
     }); // A3
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 8 * 24 + 12, y: (93 - 59) * 20 + 30 },
+      position: { x: 8 * 24 + 12, y: (84 - 59) * 20 + 30 },
       force: true
     }); // B3
     await page.locator('[data-testid="grid"]').click({
-      position: { x: 12 * 24 + 12, y: (93 - 57) * 20 + 30 },
+      position: { x: 12 * 24 + 12, y: (84 - 57) * 20 + 30 },
       force: true
     }); // A3
 
@@ -87,10 +87,16 @@ test.describe('Real-World Composition Scenario (Tier 4)', () => {
     await page.click('[data-testid="play-toggle-btn"]'); // Stop
 
     const audit = await page.evaluate(() => window.__audioAudit);
-    const noteStarts = audit.filter((evt) => evt.type === 'oscillator-start');
+    const noteStarts = audit.filter(
+      (evt) => evt.type === 'oscillator-start' && evt.role === 'fundamental'
+    );
     expect(noteStarts.length).toBeGreaterThanOrEqual(4);
 
-    noteStarts.sort((a, b) => a.timestamp - b.timestamp);
+    noteStarts.sort((a, b) =>
+      a.time !== undefined && b.time !== undefined
+        ? a.time - b.time
+        : a.timestamp - b.timestamp
+    );
     const frequencies = noteStarts.slice(0, 4).map((n) => n.frequency);
     expect(frequencies[0]).toBeCloseTo(220, -1);
     expect(frequencies[1]).toBeCloseTo(220, -1);

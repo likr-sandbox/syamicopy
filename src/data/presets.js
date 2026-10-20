@@ -1,13 +1,13 @@
+import akatomboNotes from './presets/akatombo.json';
+import furusatoNotes from './presets/furusato.json';
 import kaeruNotes from './presets/kaeru.json';
-import sakuraNotes from './presets/sakura.json';
-import tulipNotes from './presets/tulip.json';
 import kirakiraNotes from './presets/kirakira.json';
 import kojounotsukiNotes from './presets/kojounotsuki.json';
-import furusatoNotes from './presets/furusato.json';
-import momotaroNotes from './presets/momotaro.json';
-import zousanNotes from './presets/zousan.json';
 import konomichiNotes from './presets/konomichi.json';
-import akatomboNotes from './presets/akatombo.json';
+import momotaroNotes from './presets/momotaro.json';
+import sakuraNotes from './presets/sakura.json';
+import tulipNotes from './presets/tulip.json';
+import zousanNotes from './presets/zousan.json';
 
 export const PRESETS = {
   kaeru: {
@@ -19,7 +19,10 @@ export const PRESETS = {
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 120,
     measureCount: 8,
-    notes: kaeruNotes.map((note, index) => ({ id: `kaeru-${index + 1}`, ...note }))
+    notes: kaeruNotes.map((note, index) => ({
+      id: `kaeru-${index + 1}`,
+      ...note
+    }))
   },
   sakura: {
     name: 'さくらさくら',
@@ -30,7 +33,10 @@ export const PRESETS = {
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 72,
     measureCount: 14,
-    notes: sakuraNotes.map((note, index) => ({ id: `sakura-${index + 1}`, ...note }))
+    notes: sakuraNotes.map((note, index) => ({
+      id: `sakura-${index + 1}`,
+      ...note
+    }))
   },
   tulip: {
     name: 'チューリップ',
@@ -41,7 +47,10 @@ export const PRESETS = {
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 110,
     measureCount: 12,
-    notes: tulipNotes.map((note, index) => ({ id: `tulip-${index + 1}`, ...note }))
+    notes: tulipNotes.map((note, index) => ({
+      id: `tulip-${index + 1}`,
+      ...note
+    }))
   },
   kirakira: {
     name: 'きらきら星',
@@ -52,7 +61,10 @@ export const PRESETS = {
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 100,
     measureCount: 12,
-    notes: kirakiraNotes.map((note, index) => ({ id: `kirakira-${index + 1}`, ...note }))
+    notes: kirakiraNotes.map((note, index) => ({
+      id: `kirakira-${index + 1}`,
+      ...note
+    }))
   },
   kojounotsuki: {
     name: '荒城の月',
@@ -63,7 +75,10 @@ export const PRESETS = {
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 72,
     measureCount: 16,
-    notes: kojounotsukiNotes.map((note, index) => ({ id: `kojo-${index + 1}`, ...note }))
+    notes: kojounotsukiNotes.map((note, index) => ({
+      id: `kojo-${index + 1}`,
+      ...note
+    }))
   },
   furusato: {
     name: 'ふるさと',
@@ -74,7 +89,10 @@ export const PRESETS = {
     timeSignature: { numerator: 3, denominator: 4 },
     bpm: 88,
     measureCount: 16,
-    notes: furusatoNotes.map((note, index) => ({ id: `furu-${index + 1}`, ...note }))
+    notes: furusatoNotes.map((note, index) => ({
+      id: `furu-${index + 1}`,
+      ...note
+    }))
   },
   momotaro: {
     name: '桃太郎',
@@ -85,7 +103,10 @@ export const PRESETS = {
     timeSignature: { numerator: 2, denominator: 4 },
     bpm: 110,
     measureCount: 8,
-    notes: momotaroNotes.map((note, index) => ({ id: `momo-${index + 1}`, ...note }))
+    notes: momotaroNotes.map((note, index) => ({
+      id: `momo-${index + 1}`,
+      ...note
+    }))
   },
   zousan: {
     name: 'ぞうさん',
@@ -96,7 +117,10 @@ export const PRESETS = {
     timeSignature: { numerator: 2, denominator: 4 },
     bpm: 90,
     measureCount: 6,
-    notes: zousanNotes.map((note, index) => ({ id: `zou-${index + 1}`, ...note }))
+    notes: zousanNotes.map((note, index) => ({
+      id: `zou-${index + 1}`,
+      ...note
+    }))
   },
   konomichi: {
     name: 'この道',
@@ -107,7 +131,10 @@ export const PRESETS = {
     timeSignature: { numerator: 4, denominator: 4 },
     bpm: 76,
     measureCount: 8,
-    notes: konomichiNotes.map((note, index) => ({ id: `michi-${index + 1}`, ...note }))
+    notes: konomichiNotes.map((note, index) => ({
+      id: `michi-${index + 1}`,
+      ...note
+    }))
   },
   akatombo: {
     name: '赤とんぼ',
@@ -118,6 +145,9 @@ export const PRESETS = {
     timeSignature: { numerator: 3, denominator: 4 },
     bpm: 80,
     measureCount: 16,
-    notes: akatomboNotes.map((note, index) => ({ id: `tombo-${index + 1}`, ...note }))
+    notes: akatomboNotes.map((note, index) => ({
+      id: `tombo-${index + 1}`,
+      ...note
+    }))
   }
 };

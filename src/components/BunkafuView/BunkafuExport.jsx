@@ -1,13 +1,16 @@
 import React from 'react';
 import { STEP_WIDTH } from '../../utils/constants';
+import { getPitchLabel } from '../../utils/music';
 import { convertToShamisenNote } from '../../utils/shamisen';
 import { getStepsPerBeat, getStepsPerMeasure } from '../../utils/timeSignature';
-import { getPitchLabel } from '../../utils/music';
 import BunkafuNote from './BunkafuNote';
 
 const BunkafuExport = React.forwardRef(
   (
     {
+      name,
+      composer,
+      bpm,
       notes,
       tuning = 'honchoshi',
       basePitch = 48,
@@ -20,6 +23,13 @@ const BunkafuExport = React.forwardRef(
     const stepsPerMeasure = getStepsPerMeasure(timeSignature);
     const stepsPerLine = 4 * stepsPerMeasure; // 1行あたり4小節
     const totalSteps = stepsPerMeasure * measureCount;
+
+    const tuningLabel =
+      tuning === 'honchoshi'
+        ? '本調子'
+        : tuning === 'niagari'
+          ? '二上がり'
+          : '三下り';
 
     const Y_COORDINATES = {
       2: 16, // 三の糸 (上)
@@ -41,21 +51,15 @@ const BunkafuExport = React.forwardRef(
         }}
       >
         <div className="flex flex-col gap-1">
-          <h2 className="text-nouaiBlue text-lg font-bold">三味線 文化譜</h2>
-          <div className="text-[10px] text-nouaiBlue/60 flex gap-4">
-            <span>
-              調弦:{' '}
-              {tuning === 'honchoshi'
-                ? '本調子'
-                : tuning === 'niagari'
-                  ? '二上がり'
-                  : '三下り'}
-            </span>
-            <span>基準音: {getPitchLabel(basePitch)}</span>
-            <span>
-              拍子: {timeSignature.numerator}/{timeSignature.denominator}
-            </span>
-          </div>
+          <svg width="100%" height="48" className="block">
+            <title>{name || '三味線 文化譜'}</title>
+            <text x="0" y="18" fill="#1e3a5f" fontSize="16" fontWeight="bold">
+              {name || '三味線 文化譜'}
+            </text>
+            <text x="0" y="38" fill="#1e3a5f" opacity="0.6" fontSize="10">
+              {`作曲者: ${composer || '-'}   調弦: ${tuningLabel}   基準音: ${getPitchLabel(basePitch)}   拍子: ${timeSignature.numerator}/${timeSignature.denominator}${bpm ? `   テンポ: ${bpm} BPM` : ''}`}
+            </text>
+          </svg>
         </div>
 
         {lines.map((lineIndex) => {
@@ -92,7 +96,8 @@ const BunkafuExport = React.forwardRef(
             const shamiNote = convertToShamisenNote(
               note.pitch,
               tuning,
-              basePitch
+              basePitch,
+              note.preferredString
             );
             if (shamiNote) {
               const relativeStep = note.step - startStep;
@@ -113,17 +118,17 @@ const BunkafuExport = React.forwardRef(
               );
 
               // 伸ばし棒の描画
-              if (note.length > 4) {
-                for (let i = 4; i < note.length; i += 4) {
+              if (note.length > stepsPerBeat) {
+                for (let i = stepsPerBeat; i < note.length; i += stepsPerBeat) {
                   const extendStep = note.step + i;
-                  if (extendStep >= endStep) break; // この行の範囲外なら描画しない（次の行へ）
+                  if (extendStep >= endStep || extendStep >= totalSteps) break; // この行または楽曲全体の範囲外なら描画しない
 
                   const relativeExtendStep = extendStep - startStep;
                   renderItems.push(
                     <BunkafuNote
                       key={`extend-${note.id}-${extendStep}`}
                       tsubo="ー"
-                      length={4}
+                      length={stepsPerBeat}
                       isCurrent={false}
                       x={relativeExtendStep * STEP_WIDTH + STEP_WIDTH / 2}
                       y={Y_COORDINATES[shamiNote.stringIndex]}
@@ -159,22 +164,33 @@ const BunkafuExport = React.forwardRef(
               const shamiNote = convertToShamisenNote(
                 note.pitch,
                 tuning,
-                basePitch
+                basePitch,
+                note.preferredString
               );
               if (shamiNote) {
                 // この行での伸ばし棒の描画位置
-                const offsetStart = 4 - ((startStep - note.step) % 4);
-                const startOffset = offsetStart === 4 ? 0 : offsetStart;
+                const offsetStart =
+                  stepsPerBeat - ((startStep - note.step) % stepsPerBeat);
+                const startOffset =
+                  offsetStart === stepsPerBeat ? 0 : offsetStart;
 
-                for (let i = startOffset; i < endStep - startStep; i += 4) {
+                for (
+                  let i = startOffset;
+                  i < endStep - startStep;
+                  i += stepsPerBeat
+                ) {
                   const extendStep = startStep + i;
-                  if (extendStep >= note.step + note.length) break;
+                  if (
+                    extendStep >= note.step + note.length ||
+                    extendStep >= totalSteps
+                  )
+                    break;
 
                   renderItems.push(
                     <BunkafuNote
                       key={`extend-overflow-${note.id}-${extendStep}`}
                       tsubo="ー"
-                      length={4}
+                      length={stepsPerBeat}
                       isCurrent={false}
                       x={i * STEP_WIDTH + STEP_WIDTH / 2}
                       y={Y_COORDINATES[shamiNote.stringIndex]}
@@ -214,11 +230,49 @@ const BunkafuExport = React.forwardRef(
               }}
             >
               {/* 左端：糸の名称 */}
-              <div className="flex flex-col justify-between h-20 w-12 border-r border-nouaiBlue/20 text-xs text-nouaiBlue/60 font-bold py-2 items-center flex-shrink-0">
-                <span>三</span>
-                <span>二</span>
-                <span>一</span>
-              </div>
+              <svg
+                width="48"
+                height="80"
+                className="flex-shrink-0 border-r border-nouaiBlue/20"
+              >
+                <title>糸の名称</title>
+                <text
+                  x="24"
+                  y="20"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="#1e3a5f"
+                  opacity="0.6"
+                  fontSize="12"
+                  fontWeight="bold"
+                >
+                  三
+                </text>
+                <text
+                  x="24"
+                  y="44"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="#1e3a5f"
+                  opacity="0.6"
+                  fontSize="12"
+                  fontWeight="bold"
+                >
+                  二
+                </text>
+                <text
+                  x="24"
+                  y="68"
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="#1e3a5f"
+                  opacity="0.6"
+                  fontSize="12"
+                  fontWeight="bold"
+                >
+                  一
+                </text>
+              </svg>
 
               {/* 譜面グリッド */}
               <div
@@ -265,9 +319,23 @@ const BunkafuExport = React.forwardRef(
                         style={{ left: `${stepOffset * STEP_WIDTH}px` }}
                       >
                         {isMeasure && absoluteStep < totalSteps && (
-                          <span className="absolute top-[-14px] left-1 text-[9px] text-nouaiBlue/50 font-bold">
-                            {absoluteStep / stepsPerMeasure + 1}
-                          </span>
+                          <svg
+                            width="28"
+                            height="14"
+                            className="absolute top-[-14px] left-1 pointer-events-none"
+                          >
+                            <title>{`第${absoluteStep / stepsPerMeasure + 1}小節`}</title>
+                            <text
+                              x="0"
+                              y="10"
+                              fill="#1e3a5f"
+                              opacity="0.5"
+                              fontSize="9"
+                              fontWeight="bold"
+                            >
+                              {absoluteStep / stepsPerMeasure + 1}
+                            </text>
+                          </svg>
                         )}
                       </div>
                     );

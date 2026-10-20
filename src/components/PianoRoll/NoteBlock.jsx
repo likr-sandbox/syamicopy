@@ -187,10 +187,32 @@ export const NoteBlock = ({
   const top = (MAX_PITCH - note.pitch) * ROW_HEIGHT + dragOffset.y;
   const width = resizeWidth !== null ? resizeWidth : note.length * STEP_WIDTH;
 
-  const shamiNote = convertToShamisenNote(note.pitch, tuning, basePitch);
+  const shamiNote = convertToShamisenNote(
+    note.pitch,
+    tuning,
+    basePitch,
+    note.preferredString
+  );
   const shamiLabel = shamiNote
     ? `${shamiNote.stringIndex + 1}-${shamiNote.tsubo}`
     : '';
+
+  const playableStrings = [0, 1, 2].filter((s) => {
+    const res = convertToShamisenNote(note.pitch, tuning, basePitch, s);
+    return res && res.stringIndex === s;
+  });
+
+  const handleCycleString = (e) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (playableStrings.length <= 1) return;
+    const currentStr = shamiNote ? shamiNote.stringIndex : playableStrings[0];
+    const currentIdx = playableStrings.indexOf(currentStr);
+    const nextIdx = (currentIdx + 1) % playableStrings.length;
+    updateNote(note.id, { preferredString: playableStrings[nextIdx] });
+  };
 
   return (
     <div
@@ -206,12 +228,46 @@ export const NoteBlock = ({
       onPointerMove={handleDragPointerMove}
       onPointerUp={handleDragPointerUp}
       onPointerCancel={handleDragPointerUp}
+      onContextMenu={(e) => {
+        if (playableStrings.length > 1) {
+          handleCycleString(e);
+        }
+      }}
+      onDoubleClick={(e) => {
+        if (playableStrings.length > 1) {
+          handleCycleString(e);
+        }
+      }}
       data-testid={`note-block-${note.id}`}
     >
       {note.length >= 2 && (
         <>
           <span className="truncate pr-1">{getPitchLabel(note.pitch)}</span>
-          <span className="opacity-80 text-[8px] bg-black/20 px-1 rounded flex-shrink-0">
+          <span
+            role={playableStrings.length > 1 ? 'button' : undefined}
+            tabIndex={playableStrings.length > 1 ? 0 : undefined}
+            className={`opacity-80 text-[8px] bg-black/20 px-1 rounded flex-shrink-0 ${
+              playableStrings.length > 1
+                ? 'cursor-pointer hover:bg-black/40'
+                : ''
+            }`}
+            onClick={handleCycleString}
+            onKeyDown={(e) => {
+              if (
+                playableStrings.length > 1 &&
+                (e.key === 'Enter' || e.key === ' ')
+              ) {
+                handleCycleString(e);
+              }
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            title={
+              playableStrings.length > 1
+                ? 'クリックで使用する弦を切り替え'
+                : undefined
+            }
+            data-testid={`preferred-string-toggle-${note.id}`}
+          >
             {shamiLabel}
           </span>
         </>
