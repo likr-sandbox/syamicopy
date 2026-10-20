@@ -73,7 +73,11 @@ const BunkafuExport = React.forwardRef(
 
           // この行に含まれる休符の計算
           const lineRests = [];
-          for (let s = startStep; s < endStep; s += stepsPerBeat) {
+          for (
+            let s = startStep;
+            s < Math.min(endStep, totalSteps);
+            s += stepsPerBeat
+          ) {
             const isSounding = notes.some(
               (note) => s >= note.step && s < note.step + note.length
             );
